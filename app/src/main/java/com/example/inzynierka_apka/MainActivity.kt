@@ -1,5 +1,6 @@
 package com.example.inzynierka_apka
 
+import Localization
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,8 +26,15 @@ class MainActivity : AppCompatActivity() {
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
-        myGet()
+        //myGet()
         //getUsers2()
+        val local = Localization(this)
+        val latitude: Double = Localization.latitude // latitude
+
+        val longitude: Double = Localization.latitude // latitude
+
+        print(latitude)
+        print("aaaaa")
     }
 
     fun myGet() {
