@@ -37,11 +37,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun postData(lat: Double, lon: Double) {
-        val url = "$server/"
+        val url = "$server/playerinfo/send"
         val jsonObject = JSONObject()
-        jsonObject.put("id", "mmmaaa")
-        jsonObject.put("latitude", lat)
-        jsonObject.put("longitude", lon)
+        jsonObject.put("Id", "ddhdddddfd")
+        jsonObject.put("Longitude", lon)
+        jsonObject.put("Latitude", lat)
 
 
         val request = JsonObjectRequest(Request.Method.POST, url, jsonObject,
