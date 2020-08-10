@@ -1,76 +1,79 @@
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 
-class Localization(private val mContext: Context) : Service(),
-    LocationListener {
-    // flag for GPS status
+
+class Localization(private val mContext: Context, activ: Activity) : Service(), LocationListener {
     var isGPSEnabled = false
-    // flag for network status
     var isNetworkEnabled = false
-    var canGetLocation = false
     var locations : Location? = null
-    // Declaring a Location Manager
-    protected var locationManager: LocationManager? = null
+    //needed activity from main thread to request permissions
+    private var activity: Activity = activ
 
-    fun getLocation(): Location? {
+    private var locationManager: LocationManager? = null
+
+    private fun checkPermissions(): Boolean {
+        return (ActivityCompat.checkSelfPermission(
+            mContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            mContext,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    private fun grantPermissions(): Boolean {
+        //checks permissions and ask for them if needed
+        if (!checkPermissions())
+            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION), 1337)
+        else return true
+        return checkPermissions()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation(): Location? {
         try {
-            locationManager =
-                mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            // getting GPS status
+            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             isGPSEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            // getting network status
             isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
             if (!isGPSEnabled && !isNetworkEnabled) { // no network provider is enabled
             } else {
-                canGetLocation = true
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
+                    if (!grantPermissions()) return null
                     locationManager!!.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
-                        MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(),
+                        minTime,
+                        minDistance,
                         this
                     )
-                    //                  Log.d("Network", "Network");
-                    if (locationManager != null) {
-                        locations =
-                            locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                        if (locations != null) {
-                            latitude = locations!!.latitude
-                            longitude = locations!!.longitude
-                            //                          System.out.println("latitude    if (isNetworkEnabled)   => "+latitude);
-//                          System.out.println("longitude   if (isNetworkEnabled)   => "+longitude);
-                        }
-                    }
+                    locations = locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
-                // if GPS Enabled get lat/long using GPS Services
-                if (isGPSEnabled) {
-                    if (locations == null) {
-                        locationManager!!.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(),
-                            this
-                        )
-                        //                      Log.d("GPS Enabled", "GPS Enabled");
-                        if (locationManager != null) {
-                            locations =
-                                locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                            if (locations != null) {
-                                latitude = locations!!.latitude
-                                longitude = locations!!.longitude
-                                //                              System.out.println("latitude    if (isGPSEnabled)   => "+latitude);
-//                              System.out.println("longitude   if (isGPSEnabled)   => "+longitude);
-                            }
-                        }
-                    }
+
+                if (isGPSEnabled && locations == null) {
+                    locationManager!!.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        minTime,
+                        minDistance,
+                        this
+                    )
+                    locations = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 }
+                latitude = locations!!.latitude
+                longitude = locations!!.longitude
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -78,7 +81,11 @@ class Localization(private val mContext: Context) : Service(),
         return locations
     }
 
-    override fun onLocationChanged(location: Location) {}
+    override fun onLocationChanged(location: Location) {
+        latitude = location.latitude
+        longitude = location.longitude
+        locations = location
+    }
     override fun onProviderDisabled(provider: String) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onStatusChanged(
@@ -92,16 +99,14 @@ class Localization(private val mContext: Context) : Service(),
         return null
     }
 
+    //exists only one companion object between different instances of the same class
     companion object {
-        var latitude // latitude
-                = 0.0
-        var longitude // longitude
-                = 0.0
-        // The minimum distance to change Updates in meters
-        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10 // 10 meters
-        // The minimum time between updates in milliseconds
-        private const val MIN_TIME_BW_UPDATES = 1000 * 60 * 1 // 1 minute
-            .toLong()
+        var latitude = 0.0
+        var longitude = 0.0
+        //min distance to change updates in meters
+        private const val minDistance: Float = 0.1F // 0.1 meters (distance accuracy)
+        //min time between updates in milliseconds
+        private const val minTime = 1000 * 1 .toLong() // every 1 second update
     }
 
     init {

@@ -1,9 +1,14 @@
 package com.example.inzynierka_apka
 
 import Localization
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
@@ -28,13 +33,19 @@ class MainActivity : AppCompatActivity() {
 
         //myGet()
         //getUsers2()
-        val local = Localization(this)
+        print("aaaaa")
+    }
+
+
+
+    fun showLocalization(view: View) {
+        val local = Localization(this, this)
         val latitude: Double = Localization.latitude // latitude
 
-        val longitude: Double = Localization.latitude // latitude
-
+        val longitude: Double = Localization.longitude // latitude
         print(latitude)
         print("aaaaa")
+        Log.d("TAG", latitude.toString())
     }
 
     fun myGet() {
