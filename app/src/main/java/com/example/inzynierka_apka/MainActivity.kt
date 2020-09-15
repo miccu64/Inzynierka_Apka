@@ -19,7 +19,7 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
-    private val server: String = "https://192.168.2.4:45455"
+    private val server: String = "https://192.168.0.38:45455"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
         val jsonObjectRequest = JsonArrayRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
-                textView!!.text = "response :  "
+                textView!!.text = "response :  " + response
                 //textView.text = "Response: %s".format(response.toString())
             },
             Response.ErrorListener { error ->
