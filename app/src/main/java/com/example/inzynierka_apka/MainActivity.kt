@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         TODO("Ciagle jest Disconnected :C")
         val resp = hubConnection.connectionState//hubConnection.send("CreateRoom", "input")
         print(resp)
+
     }
 
     private fun myGet() {
