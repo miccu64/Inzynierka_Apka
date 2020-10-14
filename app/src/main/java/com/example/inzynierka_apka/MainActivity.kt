@@ -17,11 +17,14 @@ import com.example.rest.ServerOperations
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import org.json.JSONObject
+import java.lang.Thread.sleep
 
 
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
-    private val server: String = "https://192.168.2.2:45456"
+    //HTTPS nie zadziala na localhoscie - moze na zewnatrz pojdzie? pasobaloby xD
+    //w AndroidManifest.xml jest dodana linia i moze nie dzialac cos przez nia
+    private val server: String = "http://192.168.0.10:45455"
     private lateinit var hubConnection: HubConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private fun postData(lat: Double, lon: Double) {
         val url = "$server/coords/register"
         val jsonObject = JSONObject()
-        jsonObject.put("Id", "DAAAAXD")
+        jsonObject.put("Id", "DAAAAXDD")
         jsonObject.put("Longitude", lon)
         jsonObject.put("Latitude", lat)
 
@@ -69,16 +72,20 @@ class MainActivity : AppCompatActivity() {
         print("aaaaa")
         Log.d("TAG", latitude.toString())
         postData(latitude, longitude)
-        TODO("Ciagle jest Disconnected :C")
-        val resp = hubConnection.connectionState//hubConnection.send("CreateRoom", "input")
-        print(resp)
+        //"Ciagle jest Disconnected :C"
+        hubConnection.stop()
+        hubConnection.start()
+        val resp = hubConnection.connectionState
+        sleep(5_000)
+        //hubConnection.send("CreateRoom", "input")
+        Log.d("TAG", resp.toString())
 
     }
 
     private fun myGet() {
 
 
-        val url: String = "$server/coords/getById/2"
+        val url: String = "$server/coords/getById/aaa"
 
         val jsonObjectRequest = JsonArrayRequest(Request.Method.GET, url, null,
             Response.Listener { response ->
