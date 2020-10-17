@@ -16,9 +16,11 @@ import com.example.rest.QueueSingleton
 import com.example.rest.ServerOperations
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import com.microsoft.signalr.HubConnectionState
 import org.json.JSONObject
 import java.lang.Thread.sleep
 
+data class Params (val Id: String, val Latitude: Double, val Longitude: Double)
 
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
@@ -72,14 +74,13 @@ class MainActivity : AppCompatActivity() {
         print("aaaaa")
         Log.d("TAG", latitude.toString())
         postData(latitude, longitude)
-        //"Ciagle jest Disconnected :C"
-        hubConnection.stop()
-        hubConnection.start()
         val resp = hubConnection.connectionState
-        sleep(5_000)
         //hubConnection.send("CreateRoom", "input")
         Log.d("TAG", resp.toString())
 
+        val par = Params("Dzialaj", latitude, longitude)
+        if (hubConnection.connectionState == HubConnectionState.CONNECTED)
+            hubConnection.invoke("UpdateLocation", par, "aaa", 0)
     }
 
     private fun myGet() {
