@@ -1,4 +1,4 @@
-package com.example.rest
+package com.example.inzynierka_apka
 
 import android.content.Context
 import com.android.volley.Request
@@ -24,5 +24,6 @@ class QueueSingleton constructor(context: Context) {
     }
     fun <T> addToRequestQueue(req: Request<T>) {
         requestQueue.add(req)
+        requestQueue.start()
     }
 }
