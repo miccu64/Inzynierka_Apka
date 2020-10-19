@@ -1,22 +1,18 @@
 package com.example.inzynierka_apka
 
 import Localization
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
-
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
-import org.json.JSONObject
-import java.net.URL
 
 data class Params (val Id: String, val Latitude: Double, val Longitude: Double)
 
@@ -27,14 +23,18 @@ class MainActivity : AppCompatActivity() {
     private val server: String = "http://192.168.0.10:45455"
     private lateinit var hubConnection: HubConnection
     private var token: String? = null
-    private val uriScheme = "http"
-    private val uriAuthority = "192.168.0.10:45455"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         textView = findViewById<TextView>(R.id.textView)
         hubConnection = HubConnectionBuilder.create("$server/gamehub").build()
+        //TUTAAAAJ
+        hubConnection.on(
+            "ErrorMessage",
+            { message: String -> Toast.makeText(this, message, Toast.LENGTH_LONG).show() },
+            String::class.java
+        )
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
@@ -48,17 +48,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login(email: String, password: String) {
-        /*val builder: Uri.Builder = Uri.Builder()
-        builder.scheme(uriScheme)
-            .authority(uriAuthority).
-            .appendPath("user")
-            .appendPath("login")
-            .appendQueryParameter("email", email)
-            .appendQueryParameter("password", password)
-
-        val url = builder.build().toString()
-        val resp = URL(url).readText()
-        print(resp)*/
         val url = "$server/user/login?email=${email}&password=${password}"
         val request = StringRequest(Request.Method.GET, url,
             Response.Listener { response ->
@@ -92,6 +81,10 @@ class MainActivity : AppCompatActivity() {
         addToQueue(request)
     }*/
 
+    public fun ErrorMessage(text: String) {
+        Log.d("TAG", text)
+    }
+
     fun showLocalization(view: View) {
         login("bb", "bb")
         val local = Localization(this, this)
@@ -103,8 +96,14 @@ class MainActivity : AppCompatActivity() {
         Log.d("TAG", resp.toString())
 
         val par = Params("Dzialaj", latitude, longitude)
-        if (hubConnection.connectionState == HubConnectionState.CONNECTED)
-            hubConnection.invoke("UpdateLocation", par, "aaa", 0)
+        if (hubConnection.connectionState == HubConnectionState.CONNECTED){
+            //hubConnection.invoke("UpdateLocation", par, "aaa", 0)
+            val res = hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
+            print(res)
+        }
+
+
+
     }
 /*
     private fun myGet() {
