@@ -32,7 +32,17 @@ class MainActivity : AppCompatActivity() {
         //TUTAAAAJ
         hubConnection.on(
             "ErrorMessage",
-            { message: String -> Toast.makeText(this, message, Toast.LENGTH_LONG).show() },
+            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                textView!!.text = "response :  " + message
+                Log.d("TAG", message)},
+            String::class.java
+        )
+        hubConnection.on(
+            "SuccessMessage",
+            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                textView!!.text = "response :  " + message
+                Log.d("TAG", message)},
+                // },
             String::class.java
         )
         //ignores every certificate of SSL!!!!!!!!!!!!!!
@@ -81,9 +91,6 @@ class MainActivity : AppCompatActivity() {
         addToQueue(request)
     }*/
 
-    public fun ErrorMessage(text: String) {
-        Log.d("TAG", text)
-    }
 
     fun showLocalization(view: View) {
         login("bb", "bb")
@@ -100,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             //hubConnection.invoke("UpdateLocation", par, "aaa", 0)
             val res = hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
             print(res)
-        }
+        } else hubConnection.start()
 
 
 
