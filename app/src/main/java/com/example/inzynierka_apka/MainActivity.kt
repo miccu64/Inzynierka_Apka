@@ -13,6 +13,9 @@ import com.android.volley.toolbox.StringRequest
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
+import java.lang.Thread.sleep
+import java.util.*
+import kotlin.concurrent.timerTask
 
 data class Params (val Id: String, val Latitude: Double, val Longitude: Double)
 
@@ -45,11 +48,22 @@ class MainActivity : AppCompatActivity() {
                 // },
             String::class.java
         )
+        hubConnection.on(
+            "SaveToken",
+            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                token = message
+                textView!!.text = "response :  " + message
+                Log.d("TAG", message)
+
+                print(token)},
+            // },
+            String::class.java
+        )
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
 
-        hubConnection.start()
+
 
     }
 
@@ -57,43 +71,45 @@ class MainActivity : AppCompatActivity() {
         QueueSingleton.getInstance(this).addToRequestQueue(request)
     }
 
-    private fun login(email: String, password: String) {
-        val url = "$server/user/login?email=${email}&password=${password}"
-        val request = StringRequest(Request.Method.GET, url,
-            Response.Listener { response ->
-                token = response
-                textView!!.text = "response :  " + token
-                //textView.text = "Response: %s".format(response.toString())
-            },
-            Response.ErrorListener { error ->
-                textView!!.text = error.toString()
-            }
-        )
-        addToQueue(request)
+    private fun register(email: String, name: String, password: String) {
+        hubConnection.invoke("RegisterNewUser", email, name, password)
     }
 
-    /*private fun postData(lat: Double, lon: Double) {
-        val url = "$server/coords/register"
-        val jsonObject = JSONObject()
-        jsonObject.put("Id", "DAAAAXDD")
-        jsonObject.put("Longitude", lon)
-        jsonObject.put("Latitude", lat)
+    private fun login(email: String, password: String) {
+        hubConnection.invoke("Login", email, password)
+    }
 
+    private fun createRoom(roomName: String, password: String) {
+        hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
+    }
 
-        val request = JsonObjectRequest(Request.Method.POST, url, jsonObject,
-            Response.Listener { response ->
-                Log.d("TAG", response.toString())
-            },
-            Response.ErrorListener { error ->
-                Log.d("TAG", error.toString())
-            }
-        )
-        addToQueue(request)
-    }*/
+    private fun joinRoom(roomName: String, password: String) {
+        hubConnection.invoke("JoinRoom", roomName, password, token)
+    }
 
+    private fun updateLocation(roomName: String) {
+        hubConnection.invoke("UpdateLocation", Localization.latitude, Localization.longitude, token)
+    }
 
     fun showLocalization(view: View) {
+        while (hubConnection.connectionState != HubConnectionState.CONNECTED) {
+            hubConnection.start()
+            sleep(1000L)
+        }
+
+        //register("bb", "bb", "bb")
         login("bb", "bb")
+        Timer().schedule(timerTask {
+            //createRoom("aaa", "aaa")
+            joinRoom("aaa", "aaa")
+        }, 1000)
+        Timer().schedule(timerTask {
+            //createRoom("aaa", "aaa")
+            updateLocation("aaa")
+        }, 1500)
+
+
+        /*
         val local = Localization(this, this)
         val latitude: Double = Localization.latitude // latitude
         val longitude: Double = Localization.longitude // latitude
@@ -107,28 +123,10 @@ class MainActivity : AppCompatActivity() {
             //hubConnection.invoke("UpdateLocation", par, "aaa", 0)
             val res = hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
             print(res)
-        } else hubConnection.start()
+        } else hubConnection.start()*/
 
 
 
     }
-/*
-    private fun myGet() {
-
-
-        val url: String = "$server/coords/getById/aaa"
-
-        val jsonObjectRequest = JsonArrayRequest(Request.Method.GET, url, null,
-            Response.Listener { response ->
-                textView!!.text = "response :  "
-                //textView.text = "Response: %s".format(response.toString())
-            },
-            Response.ErrorListener { error ->
-                textView!!.text = error.toString()
-            }
-        )
-
-        addToQueue(jsonObjectRequest)
-    }*/
 
 }
