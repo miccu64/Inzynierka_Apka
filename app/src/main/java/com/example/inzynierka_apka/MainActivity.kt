@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private val server: String = "http://192.168.0.10:45455"
     private lateinit var hubConnection: HubConnection
     private var token: String? = null
+    private var localization: Localization? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
-
+        localization = Localization(this, this)
 
 
     }
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createRoom(roomName: String, password: String) {
-        hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
+        hubConnection.invoke("CreateRoom", roomName, password, token)
     }
 
     private fun joinRoom(roomName: String, password: String) {
@@ -88,6 +89,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateLocation(roomName: String) {
+
+        val latitude: Double = Localization.latitude // latitude
+        val longitude: Double = Localization.longitude // latitude
         hubConnection.invoke("UpdateLocation", Localization.latitude, Localization.longitude, token)
     }
 
@@ -97,27 +101,23 @@ class MainActivity : AppCompatActivity() {
             sleep(1000L)
         }
 
-        //register("bb", "bb", "bb")
-        login("bb", "bb")
-        Timer().schedule(timerTask {
-            //createRoom("aaa", "aaa")
-            joinRoom("aaa", "aaa")
-        }, 1000)
-        Timer().schedule(timerTask {
-            //createRoom("aaa", "aaa")
-            updateLocation("aaa")
-        }, 1500)
 
-
-        /*
-        val local = Localization(this, this)
-        val latitude: Double = Localization.latitude // latitude
-        val longitude: Double = Localization.longitude // latitude
-        Log.d("TAG", latitude.toString())
         val resp = hubConnection.connectionState
-        //hubConnection.send("CreateRoom", "input")
         Log.d("TAG", resp.toString())
 
+        //register("nowy2", "nowy2", "nowy2")
+        login("nowy2", "nowy2")
+        Timer().schedule(timerTask {
+            //createRoom("idz3", "idz3")
+            joinRoom("idz3", "idz3")
+        }, 1000)
+        updateLocation("aaa")
+
+
+
+
+
+/*
         val par = Params("Dzialaj", latitude, longitude)
         if (hubConnection.connectionState == HubConnectionState.CONNECTED){
             //hubConnection.invoke("UpdateLocation", par, "aaa", 0)
