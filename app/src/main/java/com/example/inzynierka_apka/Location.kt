@@ -20,7 +20,7 @@ class Location(mCont: Context) : Service(), LocationListener {
     var locations : Location? = null
     private var locationManager: LocationManager? = null
     private val mContext: Context = mCont
-    private val perms: MyPermissions = MyPermissions(mCont)
+    val perms: MyPermissions = MyPermissions(mCont)
 
 
     @SuppressLint("MissingPermission")
@@ -91,6 +91,7 @@ class Location(mCont: Context) : Service(), LocationListener {
     }
 
     init {
+
         getLocation()
     }
 }

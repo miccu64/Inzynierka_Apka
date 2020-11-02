@@ -20,6 +20,7 @@ import com.microsoft.signalr.HubConnectionState
 import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.timerTask
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         NukeSSLCerts.nuke()
 
         perms = MyPermissions(this)
-        grantPermissions()
+        grantPermissions() //exitProcess(-1)
 
         // Bind to LocalService
         Intent(this, HubService::class.java).also { intent ->
@@ -72,7 +73,9 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this, arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION), 1337)
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.ACCESS_NETWORK_STATE), 1337)
         else return true
         return perms.checkPermissions()
     }

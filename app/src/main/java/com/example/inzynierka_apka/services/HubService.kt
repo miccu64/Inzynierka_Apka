@@ -4,11 +4,13 @@ import Location
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
+import java.util.*
 
 class HubService : Service() {
 
@@ -16,10 +18,10 @@ class HubService : Service() {
 
     // Binder given to clients
     private val binder = HubBinder()
-
+    private lateinit var timer: Timer
     private val server: String = "http://192.168.2.2:45455"
     private lateinit var hubConnection: HubConnection
-    private var location: Location? = null
+    private lateinit var location: Location
 
     inner class HubBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
@@ -59,25 +61,46 @@ class HubService : Service() {
             },
             String::class.java
         )
-        hubConnection.on(
-            "SendLocationToServer",
-            { message: String ->
-                hubConnection.invoke("UpdateLocation", Location.latitude, Location.longitude, token)
-            },
-            String::class.java
-        )
 
         location = Location(this)
+        connect()
         return binder
     }
 
     fun connect() {
-        var i = 0
-        do {
-            hubConnection.start()
-            i++
-            Thread.sleep(1000L)
-        } while (hubConnection.connectionState != HubConnectionState.CONNECTED || i == 10)
+        val timerTask = object : TimerTask() {
+            override fun run() {
+                if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
+                    timer.cancel()
+                    timer.purge()
+                } else {
+                    if (location.perms.checkInternetConnection())
+                        hubConnection.start()
+                    //TU MOZE JAKIES PROMPT O POLACZENIE SIE
+                }
+            }
+        }
+        //turn on timer
+        timer = Timer()
+        timer.schedule(timerTask, 0L, 1000L)
+    }
+
+    private fun sendLocation() {
+        val timerTask = object : TimerTask() {
+            override fun run() {
+                if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
+                    hubConnection.invoke("UpdateLocation", Location.latitude, Location.longitude, token)
+                    Log.d("TAG", "timer")
+                } else {
+                    timer.cancel()
+                    timer.purge()
+                    connect()
+                }
+            }
+        }
+        //turn on timer
+        timer = Timer()
+        timer.schedule(timerTask, 0L, 1000L)
     }
 
     fun register(email: String, name: String, password: String) {
@@ -94,6 +117,7 @@ class HubService : Service() {
 
     fun joinRoom(roomName: String, password: String) {
         hubConnection.invoke("JoinRoom", roomName, password, token)
+        sendLocation()
     }
 
 }
