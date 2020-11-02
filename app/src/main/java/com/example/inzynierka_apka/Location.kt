@@ -11,36 +11,17 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
+import com.example.inzynierka_apka.others.MyPermissions
 
 
-class Localization(private val mContext: Context, activ: Activity) : Service(), LocationListener {
+class Location(mCont: Context) : Service(), LocationListener {
     var isGPSEnabled = false
     var isNetworkEnabled = false
     var locations : Location? = null
-    //needed activity from main thread to request permissions
-    private var activity: Activity = activ
-
     private var locationManager: LocationManager? = null
+    private val mContext: Context = mCont
+    private val perms: MyPermissions = MyPermissions(mCont)
 
-    private fun checkPermissions(): Boolean {
-        return (ActivityCompat.checkSelfPermission(
-            mContext,
-            Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-            mContext,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    private fun grantPermissions(): Boolean {
-        //checks permissions and ask for them if needed
-        if (!checkPermissions())
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION), 1337)
-        else return true
-        return checkPermissions()
-    }
 
     @SuppressLint("MissingPermission")
     private fun getLocation(): Location? {
@@ -53,7 +34,7 @@ class Localization(private val mContext: Context, activ: Activity) : Service(), 
             } else {
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
-                    if (!grantPermissions()) return null
+                    if (!perms.checkPermissions()) return null
                     locationManager!!.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
                         minTime,

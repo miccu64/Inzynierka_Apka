@@ -1,117 +1,97 @@
 package com.example.inzynierka_apka
 
-import Localization
+import Location
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.microsoft.signalr.HubConnection
-import com.microsoft.signalr.HubConnectionBuilder
+import com.example.inzynierka_apka.others.MyPermissions
+import com.example.inzynierka_apka.services.HubService
 import com.microsoft.signalr.HubConnectionState
 import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.timerTask
 
-data class Params (val Id: String, val Latitude: Double, val Longitude: Double)
-
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
     //HTTPS nie zadziala na localhoscie - moze na zewnatrz pojdzie? pasobaloby xD
     //w AndroidManifest.xml jest dodana linia i moze nie dzialac cos przez nia
-    private val server: String = "http://192.168.0.10:45455"
-    private lateinit var hubConnection: HubConnection
-    private var token: String? = null
-    private var localization: Localization? = null
+    private lateinit var perms: MyPermissions
+
+    private lateinit var hub: HubService
+    private var mBound: Boolean = false
+
+    /** Defines callbacks for service binding, passed to bindService()  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as HubService.HubBinder
+            hub = binder.getService()
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         textView = findViewById<TextView>(R.id.textView)
-        hubConnection = HubConnectionBuilder.create("$server/gamehub").build()
-        //TUTAAAAJ
-        hubConnection.on(
-            "ErrorMessage",
-            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                textView!!.text = "response :  " + message
-                Log.d("TAG", message)},
-            String::class.java
-        )
-        hubConnection.on(
-            "SuccessMessage",
-            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                textView!!.text = "response :  " + message
-                Log.d("TAG", message)},
-                // },
-            String::class.java
-        )
-        hubConnection.on(
-            "SaveToken",
-            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                token = message
-                textView!!.text = "response :  " + message
-                Log.d("TAG", message)
 
-                print(token)},
-            // },
-            String::class.java
-        )
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
-        localization = Localization(this, this)
+        perms = MyPermissions(this)
+        grantPermissions()
 
+        // Bind to LocalService
+        Intent(this, HubService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
 
+    }
+
+    private fun grantPermissions(): Boolean {
+        //checks permissions and ask for them if needed
+        if (!perms.checkPermissions())
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION), 1337)
+        else return true
+        return perms.checkPermissions()
     }
 
     private fun <T> addToQueue(request: Request<T>) {
         QueueSingleton.getInstance(this).addToRequestQueue(request)
     }
 
-    private fun register(email: String, name: String, password: String) {
-        hubConnection.invoke("RegisterNewUser", email, name, password)
-    }
 
-    private fun login(email: String, password: String) {
-        hubConnection.invoke("Login", email, password)
-    }
-
-    private fun createRoom(roomName: String, password: String) {
-        hubConnection.invoke("CreateRoom", roomName, password, token)
-    }
-
-    private fun joinRoom(roomName: String, password: String) {
-        hubConnection.invoke("JoinRoom", roomName, password, token)
-    }
-
-    private fun updateLocation(roomName: String) {
-
-        val latitude: Double = Localization.latitude // latitude
-        val longitude: Double = Localization.longitude // latitude
-        hubConnection.invoke("UpdateLocation", Localization.latitude, Localization.longitude, token)
-    }
 
     fun showLocalization(view: View) {
-        while (hubConnection.connectionState != HubConnectionState.CONNECTED) {
-            hubConnection.start()
-            sleep(1000L)
-        }
+        hub.connect()
 
-
-        val resp = hubConnection.connectionState
-        Log.d("TAG", resp.toString())
-
-        //register("nowy2", "nowy2", "nowy2")
-        login("nowy2", "nowy2")
+        //hub.register("nowy2", "nowy2", "nowy2")
+        hub.login("nowy2", "nowy2")
         Timer().schedule(timerTask {
-            //createRoom("idz3", "idz3")
-            joinRoom("idz3", "idz3")
+            hub.createRoom("idz3", "idz3")
+            hub.joinRoom("idz3", "idz3")
         }, 1000)
-        updateLocation("aaa")
 
 
 
