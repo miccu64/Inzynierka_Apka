@@ -1,6 +1,5 @@
 package com.example.inzynierka_apka
 
-import Location
 import android.Manifest
 import android.content.ComponentName
 import android.content.Context
@@ -8,7 +7,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,11 +14,8 @@ import androidx.core.app.ActivityCompat
 import com.android.volley.Request
 import com.example.inzynierka_apka.others.MyPermissions
 import com.example.inzynierka_apka.services.HubService
-import com.microsoft.signalr.HubConnectionState
-import java.lang.Thread.sleep
 import java.util.*
 import kotlin.concurrent.timerTask
-import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private var textView: TextView? = null
@@ -46,13 +41,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        textView = findViewById<TextView>(R.id.textView)
 
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
@@ -80,12 +71,6 @@ class MainActivity : AppCompatActivity() {
         return perms.checkPermissions()
     }
 
-    private fun <T> addToQueue(request: Request<T>) {
-        QueueSingleton.getInstance(this).addToRequestQueue(request)
-    }
-
-
-
     fun showLocalization(view: View) {
         hub.connect()
 
@@ -95,21 +80,12 @@ class MainActivity : AppCompatActivity() {
             hub.createRoom("idz3", "idz3")
             hub.joinRoom("idz3", "idz3")
         }, 1000)
+    }
 
-
-
-
-
-/*
-        val par = Params("Dzialaj", latitude, longitude)
-        if (hubConnection.connectionState == HubConnectionState.CONNECTED){
-            //hubConnection.invoke("UpdateLocation", par, "aaa", 0)
-            val res = hubConnection.invoke("CreateRoom", "aaa", "aaa", token)
-            print(res)
-        } else hubConnection.start()*/
-
-
-
+    fun loginButton(view: View) {
+        val login = findViewById<TextView>(R.id.inputLogin).text.toString()
+        val pass = findViewById<TextView>(R.id.inputPassword).text.toString()
+        hub.login(login, pass)
     }
 
 }

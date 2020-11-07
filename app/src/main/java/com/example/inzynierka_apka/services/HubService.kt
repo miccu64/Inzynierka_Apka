@@ -19,7 +19,7 @@ class HubService : Service() {
     // Binder given to clients
     private val binder = HubBinder()
     private lateinit var timer: Timer
-    private val server: String = "http://192.168.2.2:45455"
+    private val server: String = "http://192.168.0.10:45455"
     private lateinit var hubConnection: HubConnection
     private lateinit var location: Location
 
@@ -48,7 +48,7 @@ class HubService : Service() {
         )
         hubConnection.on(
             "SaveToken",
-            { message: String -> //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            { message: String ->
                 token = message
                 Log.d("TAG", message)
             },
@@ -65,6 +65,15 @@ class HubService : Service() {
         location = Location(this)
         connect()
         return binder
+    }
+
+    private fun checkHubConnection(): Boolean {
+        return if (hubConnection.connectionState == HubConnectionState.CONNECTED)
+            true
+        else {
+            connect()
+            false
+        }
     }
 
     fun connect() {
@@ -104,20 +113,25 @@ class HubService : Service() {
     }
 
     fun register(email: String, name: String, password: String) {
-        hubConnection.invoke("RegisterNewUser", email, name, password)
+        if (checkHubConnection())
+            hubConnection.invoke("RegisterNewUser", email, name, password)
     }
 
     fun login(email: String, password: String) {
-        hubConnection.invoke("Login", email, password)
+        if (checkHubConnection())
+            hubConnection.invoke("Login", email, password)
     }
 
     fun createRoom(roomName: String, password: String) {
-        hubConnection.invoke("CreateRoom", roomName, password, token)
+        if (checkHubConnection())
+            hubConnection.invoke("CreateRoom", roomName, password, token)
     }
 
     fun joinRoom(roomName: String, password: String) {
-        hubConnection.invoke("JoinRoom", roomName, password, token)
-        sendLocation()
+        if (checkHubConnection()) {
+            hubConnection.invoke("JoinRoom", roomName, password, token)
+            sendLocation()
+        }
     }
 
 }
