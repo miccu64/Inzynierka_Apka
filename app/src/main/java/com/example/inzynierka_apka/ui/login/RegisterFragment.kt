@@ -11,11 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.Toast
 
 import com.example.inzynierka_apka.R
 
-class LoginFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
     private lateinit var loginViewModel: LoginViewModel
 
@@ -24,7 +27,7 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.activity_main, container, false)
+        return inflater.inflate(R.layout.fragment_register, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

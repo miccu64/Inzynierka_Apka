@@ -11,19 +11,18 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.android.volley.Request
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.inzynierka_apka.others.MyPermissions
 import com.example.inzynierka_apka.services.HubService
-import java.util.*
-import kotlin.concurrent.timerTask
+import com.example.inzynierka_apka.ui.login.LoginFragment
 
 class MainActivity : AppCompatActivity() {
-    private var textView: TextView? = null
     //HTTPS nie zadziala na localhoscie - moze na zewnatrz pojdzie? pasobaloby xD
     //w AndroidManifest.xml jest dodana linia i moze nie dzialac cos przez nia
     private lateinit var perms: MyPermissions
 
-    private lateinit var hub: HubService
+    lateinit var hub: HubService
     private var mBound: Boolean = false
 
     /** Defines callbacks for service binding, passed to bindService()  */
@@ -55,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         Intent(this, HubService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
-
     }
 
     private fun grantPermissions(): Boolean {
@@ -71,21 +69,38 @@ class MainActivity : AppCompatActivity() {
         return perms.checkPermissions()
     }
 
-    fun showLocalization(view: View) {
-        hub.connect()
-
-        //hub.register("nowy2", "nowy2", "nowy2")
-        hub.login("nowy2", "nowy2")
-        Timer().schedule(timerTask {
-            hub.createRoom("idz3", "idz3")
-            hub.joinRoom("idz3", "idz3")
-        }, 1000)
+    fun loginButton(view: View) {
+        val login = findViewById<TextView>(R.id.emailLogin).text.toString()
+        val pass = findViewById<TextView>(R.id.passwordLogin).text.toString()
+        hub.login(login, pass)
     }
 
-    fun loginButton(view: View) {
-        val login = findViewById<TextView>(R.id.inputLogin).text.toString()
-        val pass = findViewById<TextView>(R.id.inputPassword).text.toString()
-        hub.login(login, pass)
+    fun registerButton(view: View) {
+        val login = findViewById<TextView>(R.id.loginRegister).text.toString()
+        val email = findViewById<TextView>(R.id.emailRegister).text.toString()
+        val pass = findViewById<TextView>(R.id.passwordRegister).text.toString()
+        hub.register(email, login, pass)
+    }
+
+    fun goToRegister(view: View) {
+        setContentView(R.layout.fragment_register)
+    }
+
+    fun goToLogin(view: View) {
+        setContentView(R.layout.activity_main)
+
+        /*
+        // set desired fragment for the first time
+        val fm: FragmentManager = supportFragmentManager
+        val ft: FragmentTransaction = fm.beginTransaction()
+
+        // The id specified here identifies which ViewGroup to
+        // append the Fragment to.
+
+        // The id specified here identifies which ViewGroup to
+        // append the Fragment to.
+        ft.add(R.id.activity_main, LoginFragment())
+        ft.commit()*/
     }
 
 }
