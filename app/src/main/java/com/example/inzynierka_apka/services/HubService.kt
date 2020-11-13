@@ -30,6 +30,7 @@ class HubService : Service() {
     private val server: String = "http://192.168.2.10:45455"
     private lateinit var hubConnection: HubConnection
     private lateinit var location: Location
+    private var count = 0
 
     inner class HubBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
@@ -98,15 +99,21 @@ class HubService : Service() {
     }
 
     fun connect() {
+        count = 0
         val timerTask = object : TimerTask() {
             override fun run() {
                 if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
                     timer.cancel()
                     timer.purge()
                 } else {
-                    if (location.perms.checkInternetConnection())
+                    if (location.perms.checkInternetConnection()) {
+                        if (count == 5) {
+                            showToast("Brak połączenia z serwerem.")
+                        }
+                        count++
                         hubConnection.start()
-                    //TU MOZE JAKIES PROMPT O POLACZENIE SIE
+                    } else if (count == 0)
+                        showToast("Uruchom transmisję danych.")
                 }
             }
         }

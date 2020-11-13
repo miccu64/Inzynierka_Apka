@@ -11,11 +11,12 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.inzynierka_apka.others.MyPermissions
 import com.example.inzynierka_apka.services.HubService
 import com.example.inzynierka_apka.ui.login.LoginFragment
+import com.example.inzynierka_apka.ui.login.RegisterFragment
+
 
 class MainActivity : AppCompatActivity() {
     //HTTPS nie zadziala na localhoscie - moze na zewnatrz pojdzie? pasobaloby xD
@@ -23,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var perms: MyPermissions
 
     lateinit var hub: HubService
-    private var mBound: Boolean = false
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -32,17 +32,18 @@ class MainActivity : AppCompatActivity() {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             val binder = service as HubService.HubBinder
             hub = binder.getService()
-            mBound = true
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
+        override fun onServiceDisconnected(arg0: ComponentName) { }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // Begin the transaction
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_container, LoginFragment())
+        ft.commit()
 
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
@@ -83,24 +84,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goToRegister(view: View) {
-        setContentView(R.layout.fragment_register)
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_container, RegisterFragment())
+        ft.commit()
     }
 
     fun goToLogin(view: View) {
-        setContentView(R.layout.activity_main)
-
-        /*
-        // set desired fragment for the first time
-        val fm: FragmentManager = supportFragmentManager
-        val ft: FragmentTransaction = fm.beginTransaction()
-
-        // The id specified here identifies which ViewGroup to
-        // append the Fragment to.
-
-        // The id specified here identifies which ViewGroup to
-        // append the Fragment to.
-        ft.add(R.id.activity_main, LoginFragment())
-        ft.commit()*/
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_container, LoginFragment())
+        ft.commit()
     }
 
 }

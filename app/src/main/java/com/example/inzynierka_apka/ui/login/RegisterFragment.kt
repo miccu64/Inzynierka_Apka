@@ -35,9 +35,9 @@ class RegisterFragment : Fragment() {
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
-        val usernameEditText = view.findViewById<EditText>(R.id.emailLogin)
-        val passwordEditText = view.findViewById<EditText>(R.id.passwordLogin)
-        val loginButton = view.findViewById<Button>(R.id.login)
+        val usernameEditText = view.findViewById<EditText>(R.id.emailRegister)
+        val passwordEditText = view.findViewById<EditText>(R.id.passwordRegister)
+        val loginButton = view.findViewById<Button>(R.id.register)
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel.loginFormState.observe(this,
