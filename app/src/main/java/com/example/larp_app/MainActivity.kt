@@ -1,27 +1,30 @@
 package com.example.larp_app
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.R.id.message
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentTransaction
 import com.example.larp_app.others.MyPermissions
 import com.example.larp_app.services.HubService
+import com.example.larp_app.services.IHubCallback
 import com.example.larp_app.ui.login.LoginFragment
 import com.example.larp_app.ui.login.RegisterFragment
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : IHubCallback, AppCompatActivity() {
     //HTTPS nie zadziala na localhoscie - moze na zewnatrz pojdzie? pasobaloby xD
     //w AndroidManifest.xml jest dodana linia i moze nie dzialac cos przez nia
     private lateinit var perms: MyPermissions
+    private lateinit var dialog: android.app.AlertDialog
 
     lateinit var hub: HubService
 
@@ -32,6 +35,8 @@ class MainActivity : AppCompatActivity() {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             val binder = service as HubService.HubBinder
             hub = binder.getService()
+            //register this for callbacks from HubService to fragments
+            hub.setCallbacks(this@MainActivity)
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) { }
@@ -70,16 +75,11 @@ class MainActivity : AppCompatActivity() {
         return perms.checkPermissions()
     }
 
-    fun loginButton(view: View) {
-        val login = findViewById<TextView>(R.id.emailLogin).text.toString()
-        val pass = findViewById<TextView>(R.id.passwordLogin).text.toString()
+    fun login(login: String, pass: String) {
         hub.login(login, pass)
     }
 
-    fun registerButton(view: View) {
-        val login = findViewById<TextView>(R.id.loginRegister).text.toString()
-        val email = findViewById<TextView>(R.id.emailRegister).text.toString()
-        val pass = findViewById<TextView>(R.id.passwordRegister).text.toString()
+    fun register(login: String, email: String, pass: String) {
         hub.register(email, login, pass)
     }
 
@@ -95,4 +95,36 @@ class MainActivity : AppCompatActivity() {
         ft.commit()
     }
 
+    override fun goToLogin2() {
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_container, LoginFragment())
+        ft.commit()
+    }
+
+    override fun loginSuccess() {
+        Log.d("TAG", "DFZIALAAAA")
+    }
+
+    override fun loginRegisterError(text: String) {
+        val loadingBar = findViewById<ProgressBar>(R.id.loading)
+        loadingBar.visibility = View.GONE
+    }
+
+    override fun showDialog(title: String, message: String) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setCancelable(true)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun hideDialog() {
+        //try for not dismiss not initialized lateinit property
+        try {
+            dialog.dismiss()
+            val loadingBar = findViewById<ProgressBar>(R.id.loading)
+            loadingBar.visibility = View.GONE
+        } catch (e: Exception) { }
+    }
 }
