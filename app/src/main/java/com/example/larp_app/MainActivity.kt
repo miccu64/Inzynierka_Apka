@@ -1,15 +1,15 @@
 package com.example.larp_app
 
 import android.Manifest
-import android.R.id.message
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentTransaction
@@ -85,20 +85,18 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun goToRegister(view: View) {
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_container, RegisterFragment())
+        //addToBackStack() allows to use back button to back to login from register
+        ft.replace(R.id.fragment_container, RegisterFragment()).addToBackStack(null)
         ft.commit()
     }
 
     fun goToLogin(view: View) {
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_container, LoginFragment())
-        ft.commit()
+        //go back to login
+        onBackPressed()
     }
 
     override fun goToLogin2() {
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_container, LoginFragment())
-        ft.commit()
+        onBackPressed()
     }
 
     override fun loginSuccess() {

@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
+import com.microsoft.signalr.OnClosedCallback
 import java.util.*
 
 
@@ -78,7 +79,7 @@ class HubService : Service() {
             "SaveToken",
             { message: String ->
                 token = message
-                Log.d("TAG", message)
+                callback.loginSuccess()
             },
             String::class.java
         )
@@ -105,9 +106,12 @@ class HubService : Service() {
             },
             String::class.java
         )
-
+        hubConnection.onClosed {
+            connect()
+        }
         location = Location(this)
         connect()
+        //hubConnection.start()
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -119,7 +123,8 @@ class HubService : Service() {
             true
         else {
             callback.showDialog("Brak połączenia", "Ponowne łączenie...")
-            connect()
+            //connect()
+            //hubConnection.start()
             false
         }
     }
@@ -144,7 +149,7 @@ class HubService : Service() {
         }
         //turn on timer
         timer = Timer()
-        timer.schedule(timerTask, 0L, 500L)
+        timer.schedule(timerTask, 0, 2000)
     }
 
     private fun sendLocation() {

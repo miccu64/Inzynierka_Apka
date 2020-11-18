@@ -15,6 +15,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.larp_app.MainActivity
 
 import com.example.larp_app.R
@@ -41,6 +43,8 @@ class RegisterFragment : Fragment() {
         val passwordEditText = view.findViewById<EditText>(R.id.passwordRegister)
         val loginButton = view.findViewById<Button>(R.id.register)
         val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loading)
+
+        loginButton.isEnabled = false
 
         loginViewModel.loginFormState.observe(this,
             Observer { loginFormState ->
