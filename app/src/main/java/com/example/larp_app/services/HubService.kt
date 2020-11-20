@@ -102,7 +102,7 @@ class HubService : Service() {
             "LoginRegisterError",
             { message: String ->
                 showToast(message)
-                callback.loginRegisterError(message)
+                callback.hideDialog()
             },
             String::class.java
         )

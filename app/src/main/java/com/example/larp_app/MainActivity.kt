@@ -49,7 +49,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_container, LoginFragment())
         ft.commit()
-
         //ignores every certificate of SSL!!!!!!!!!!!!!!
         NukeSSLCerts.nuke()
 
@@ -76,10 +75,12 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     fun login(login: String, pass: String) {
+        showDialog("", "Logowanie...")
         hub.login(login, pass)
     }
 
     fun register(login: String, email: String, pass: String) {
+        showDialog("", "Logowanie...")
         hub.register(email, login, pass)
     }
 
@@ -92,6 +93,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun goToLogin(view: View) {
         //go back to login
+
         onBackPressed()
     }
 
@@ -101,11 +103,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     override fun loginSuccess() {
         Log.d("TAG", "DFZIALAAAA")
-    }
-
-    override fun loginRegisterError(text: String) {
-        val loadingBar = findViewById<ProgressBar>(R.id.loading)
-        loadingBar.visibility = View.GONE
     }
 
     override fun showDialog(title: String, message: String) {
@@ -121,8 +118,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         //try for not dismiss not initialized lateinit property
         try {
             dialog.dismiss()
-            val loadingBar = findViewById<ProgressBar>(R.id.loading)
-            loadingBar.visibility = View.GONE
         } catch (e: Exception) { }
     }
 }

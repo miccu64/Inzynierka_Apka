@@ -42,7 +42,6 @@ class RegisterFragment : Fragment() {
         val emailEditText = view.findViewById<EditText>(R.id.emailRegister)
         val passwordEditText = view.findViewById<EditText>(R.id.passwordRegister)
         val loginButton = view.findViewById<Button>(R.id.register)
-        val loadingProgressBar = view.findViewById<ProgressBar>(R.id.loading)
 
         loginButton.isEnabled = false
 
@@ -82,7 +81,6 @@ class RegisterFragment : Fragment() {
         }
 
         loginButton.setOnClickListener {
-            loadingProgressBar.visibility = View.VISIBLE
             //invoke fun from MainActivity
             (activity as MainActivity).register(usernameEditText.text.toString(), emailEditText.text.toString(), passwordEditText.text.toString())
         }
