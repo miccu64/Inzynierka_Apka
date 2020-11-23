@@ -15,12 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+
         <service
-            android:name="com.example.larp_app.services.HubService"
+            android:name=".services.HubService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name="com.example.larp_app.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

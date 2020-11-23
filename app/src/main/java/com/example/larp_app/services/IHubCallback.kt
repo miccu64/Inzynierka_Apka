@@ -5,5 +5,6 @@ interface IHubCallback {
     fun loginSuccess()
     fun showDialog(title: String, message: String)
     fun hideDialog()
+    fun showToast(text: String)
     fun goToLogin2()
 }

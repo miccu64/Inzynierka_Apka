@@ -6,10 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
-import android.util.Log
+import android.os.Looper
 import android.view.View
-import android.widget.ProgressBar
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentTransaction
@@ -27,6 +30,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     private lateinit var dialog: android.app.AlertDialog
 
     lateinit var hub: HubService
+    private var bound: Boolean = false
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -37,27 +41,69 @@ class MainActivity : IHubCallback, AppCompatActivity() {
             hub = binder.getService()
             //register this for callbacks from HubService to fragments
             hub.setCallbacks(this@MainActivity)
+            bound = true
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) { }
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            bound = false
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // Begin the transaction
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_container, LoginFragment())
-        ft.commit()
+
         //ignores every certificate of SSL!!!!!!!!!!!!!!
-        NukeSSLCerts.nuke()
+        //NukeSSLCerts.nuke()
 
         perms = MyPermissions(this)
         grantPermissions() //exitProcess(-1)
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        //addToBackStack() allows to use back button to back to login from register
+        ft.replace(R.id.fragment_container, LoginFragment()).addToBackStack(null)
+        ft.commit()
+
         // Bind to LocalService
         Intent(this, HubService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun showRooms() {
+        val mobileArray = arrayOf(
+            "Android", "IPhone", "WindowsMobile", "Blackberry",
+            "WebOS", "Ubuntu", "Windows7", "Max OS X"
+        )
+        // Begin the transaction
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fragment_container, RoomFragment(mobileArray))
+        ft.commit()
+    }
+
+    fun joinJoinedRoom(room: String) {
+        hub.joinJoinedRoom(room)
+    }
+
+    fun createRoom(name: String, pass: String) {
+        hub.createRoom(name, pass)
+    }
+
+    fun joinRoom(name:String, pass: String) {
+        hub.joinRoom(name, pass)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (bound) {
+            hub.setCallbacks(null)
+            unbindService(connection)
+            bound = false
         }
     }
 
@@ -80,7 +126,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     fun register(login: String, email: String, pass: String) {
-        showDialog("", "Logowanie...")
+        showDialog("", "Rejestrowanie...")
         hub.register(email, login, pass)
     }
 
@@ -93,25 +139,40 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun goToLogin(view: View) {
         //go back to login
-
         onBackPressed()
     }
 
     override fun goToLogin2() {
-        onBackPressed()
+        Handler(Looper.getMainLooper()).post {
+            onBackPressed()
+        }
+    }
+
+    override fun showToast(text: String) {
+        //looper is needed bcs of asynchronous callback
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun loginSuccess() {
-        Log.d("TAG", "DFZIALAAAA")
+        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+        //addToBackStack() allows to use back button to back to login from register
+        ft.replace(R.id.fragment_container, RegisterFragment()).addToBackStack(null)
+        ft.commit()
     }
 
     override fun showDialog(title: String, message: String) {
-        val builder = android.app.AlertDialog.Builder(this)
-        builder.setCancelable(true)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        dialog = builder.create()
-        dialog.show()
+        Handler(Looper.getMainLooper()).post {
+            hideDialog()
+            val builder = android.app.AlertDialog.Builder(this)
+            builder.setCancelable(true)
+            builder.setTitle(title)
+            builder.setMessage(message)
+            dialog = builder.create()
+            dialog.setCancelable(true)
+            dialog.show()
+        }
     }
 
     override fun hideDialog() {
@@ -120,4 +181,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
             dialog.dismiss()
         } catch (e: Exception) { }
     }
+
+
 }
