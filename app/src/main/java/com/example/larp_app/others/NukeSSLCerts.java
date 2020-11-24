@@ -1,4 +1,4 @@
-package com.example.larp_app;
+package com.example.larp_app.others;
 
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;

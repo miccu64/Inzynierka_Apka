@@ -7,12 +7,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -40,7 +36,7 @@ class LoginFragment : Fragment() {
         val passwordEditText = view.findViewById<EditText>(R.id.passwordLogin)
         val loginButton = view.findViewById<Button>(R.id.login)
 
-        loginButton.isEnabled = false
+        loginButton.isEnabled = true
 
         loginViewModel.loginFormState.observe(this,
             Observer { loginFormState ->
@@ -70,12 +66,6 @@ class LoginFragment : Fragment() {
         }
         usernameEditText.addTextChangedListener(afterTextChangedListener)
         passwordEditText.addTextChangedListener(afterTextChangedListener)
-        passwordEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                (activity as MainActivity).login(usernameEditText.text.toString(), passwordEditText.text.toString())
-            }
-            false
-        }
 
         loginButton.setOnClickListener {
             //invoke fun from MainActivity

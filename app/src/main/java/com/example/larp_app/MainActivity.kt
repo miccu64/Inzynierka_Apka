@@ -10,8 +10,6 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.view.View
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -21,6 +19,7 @@ import com.example.larp_app.services.HubService
 import com.example.larp_app.services.IHubCallback
 import com.example.larp_app.ui.login.LoginFragment
 import com.example.larp_app.ui.login.RegisterFragment
+import com.example.larp_app.ui.room.RoomFragment
 
 
 class MainActivity : IHubCallback, AppCompatActivity() {
@@ -73,17 +72,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         Intent(this, HubService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
-    }
-
-    private fun showRooms() {
-        val mobileArray = arrayOf(
-            "Android", "IPhone", "WindowsMobile", "Blackberry",
-            "WebOS", "Ubuntu", "Windows7", "Max OS X"
-        )
-        // Begin the transaction
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_container, RoomFragment(mobileArray))
-        ft.commit()
     }
 
     fun joinJoinedRoom(room: String) {
@@ -155,20 +143,23 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         }
     }
 
-    override fun loginSuccess() {
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        //addToBackStack() allows to use back button to back to login from register
-        ft.replace(R.id.fragment_container, RegisterFragment()).addToBackStack(null)
-        ft.commit()
+    override fun loginSuccess(roomList: String) {
+        hideDialog()
+        Handler(Looper.getMainLooper()).post {
+            val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+            //addToBackStack() allows to use back button to back to login from register
+            ft.replace(R.id.fragment_container,
+                RoomFragment(roomList)
+            ).addToBackStack(null)
+            ft.commit()
+        }
     }
 
     override fun showDialog(title: String, message: String) {
         Handler(Looper.getMainLooper()).post {
             hideDialog()
             val builder = android.app.AlertDialog.Builder(this)
-            builder.setCancelable(true)
-            builder.setTitle(title)
-            builder.setMessage(message)
+            builder.setCancelable(true).setTitle(title).setMessage(message)
             dialog = builder.create()
             dialog.setCancelable(true)
             dialog.show()

@@ -2,14 +2,12 @@ package com.example.larp_app.services
 
 import Location
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
-import android.widget.Toast
+import com.microsoft.signalr.Action1
+import com.microsoft.signalr.Action2
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
@@ -66,14 +64,6 @@ class HubService : Service() {
             }, String::class.java
         )
         hubConnection.on(
-            "SaveToken",
-            { message: String ->
-                token = message
-                callback?.loginSuccess()
-            },
-            String::class.java
-        )
-        hubConnection.on(
             "GetLocationFromServer",
             { message: String ->
                 Log.d("TAG", message)
@@ -82,11 +72,11 @@ class HubService : Service() {
         )
         hubConnection.on(
             "LoginSuccess",
-            { message: String ->
-                Log.d("TAG", message)
-                callback?.loginSuccess()
+            { tok: String, roomList: String ->
+                token = tok
+                callback?.loginSuccess(roomList)
             },
-            String::class.java
+            String::class.java, String::class.java
         )
         hubConnection.on(
             "LoginRegisterError",

@@ -1,4 +1,4 @@
-package com.example.larp_app
+package com.example.larp_app.others
 
 import android.content.Context
 import com.android.volley.Request
@@ -11,7 +11,8 @@ class QueueSingleton constructor(context: Context) {
         private var INSTANCE: QueueSingleton? = null
         fun getInstance(context: Context) =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: QueueSingleton(context).also {
+                INSTANCE
+                    ?: QueueSingleton(context).also {
                     INSTANCE = it
                 }
             }

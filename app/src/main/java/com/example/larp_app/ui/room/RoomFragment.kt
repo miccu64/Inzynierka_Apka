@@ -1,22 +1,27 @@
-package com.example.larp_app
+package com.example.larp_app.ui.room
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.fragment.app.ListFragment
+import com.example.larp_app.MainActivity
+import com.example.larp_app.R
 import kotlinx.android.synthetic.main.fragment_room.*
 
 
-class RoomFragment(arr: Array<String>) : ListFragment() {
-    private val array: Array<String> = arr
+class RoomFragment(arr: String) : ListFragment() {
+    private var array: String = arr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter: ArrayAdapter<String> = ArrayAdapter(activity?.baseContext!!, R.layout.item_layout, array)
+        //val arr = arrayOf<String>("Ajay","Prakesh","Michel","John","Sumit")
+        array = array.slice(2 until array.length)
+        array = array.slice(0 until array.length-2)
+        val arr = array.split("\",\"").map { it.trim() }
+        val adapter: ArrayAdapter<String> = ArrayAdapter(activity?.baseContext!!,
+            R.layout.item_layout, arr)
 
         val listView = view.findViewById<View>(android.R.id.list) as ListView
         //adapter makes buttons of array

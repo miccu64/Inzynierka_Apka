@@ -15,19 +15,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
-        <service
-            android:name=".services.HubService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".GameActivity"
+            android:label="@string/title_activity_game"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".services.HubService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>
