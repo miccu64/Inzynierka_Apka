@@ -1,24 +1,28 @@
 package com.example.larp_app
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.ServiceConnection
-import android.os.*
-import android.widget.Toast
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.util.AttributeSet
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.example.larp_app.services.HubService
 import com.example.larp_app.services.IHubCallback
 import com.example.larp_app.ui.main.SectionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.views.MapView
 
 
 class GameActivity : IHubCallback, AppCompatActivity() {
 
     private lateinit var dialog: android.app.AlertDialog
+
+
 
     lateinit var hub: HubService
     private var bound: Boolean = false
@@ -83,6 +87,7 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+
 
     }
 
