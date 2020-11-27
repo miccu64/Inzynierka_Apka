@@ -1,11 +1,11 @@
-package com.example.larp_app.ui.main
+package com.example.larp_app.ui.room
 
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.larp_app.ChatFragment
-import com.example.larp_app.MapFragment
+import com.example.larp_app.MapsFragment
 import com.example.larp_app.R
 
 private val TAB_TITLES = arrayOf(
@@ -22,8 +22,8 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
 
     override fun getItem(position: Int): Fragment {
         return if(position == 1)
-            MapFragment()
-        else ChatFragment()
+            ChatFragment()
+        else MapsFragment()
     }
 
     override fun getPageTitle(position: Int): CharSequence? {

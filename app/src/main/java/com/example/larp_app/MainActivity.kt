@@ -76,6 +76,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun joinJoinedRoom(room: String) {
         hub.joinJoinedRoom(room)
+        setContentView(R.layout.activity_game)
     }
 
     fun createRoom(name: String, pass: String) {
@@ -84,6 +85,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun joinRoom(name:String, pass: String) {
         hub.joinRoom(name, pass)
+        setContentView(R.layout.activity_game)
     }
 
     override fun onStop() {

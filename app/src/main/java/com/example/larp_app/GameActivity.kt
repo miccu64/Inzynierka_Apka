@@ -1,20 +1,17 @@
 package com.example.larp_app
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.AttributeSet
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.larp_app.services.HubService
 import com.example.larp_app.services.IHubCallback
-import com.example.larp_app.ui.main.SectionsPagerAdapter
+import com.example.larp_app.ui.room.SectionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 
 
@@ -82,7 +79,11 @@ class GameActivity : IHubCallback, AppCompatActivity() {
 
 
         setContentView(R.layout.activity_game)
-        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+        val sectionsPagerAdapter =
+            SectionsPagerAdapter(
+                this,
+                supportFragmentManager
+            )
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
