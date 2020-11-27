@@ -23,8 +23,8 @@ class HubService : Service() {
     private var callback: IHubCallback? = null
 
 
-    //private val server: String = "http://192.168.0.10:45455"
-    private val server: String = "http://192.168.2.10:45455"
+    private val server: String = "http://192.168.0.10:45455"
+    //private val server: String = "http://192.168.2.10:45455"
     private lateinit var hubConnection: HubConnection
     private lateinit var location: Location
     private var count = 0

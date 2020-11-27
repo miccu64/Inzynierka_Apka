@@ -76,7 +76,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun joinJoinedRoom(room: String) {
         hub.joinJoinedRoom(room)
-        setContentView(R.layout.activity_game)
+        startGameActivity()
     }
 
     fun createRoom(name: String, pass: String) {
@@ -85,7 +85,13 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun joinRoom(name:String, pass: String) {
         hub.joinRoom(name, pass)
-        setContentView(R.layout.activity_game)
+        startGameActivity()
+    }
+
+    private fun startGameActivity() {
+        val intent = Intent(this, GameActivity::class.java)
+        startActivity(intent)
+        this.finish()
     }
 
     override fun onStop() {
