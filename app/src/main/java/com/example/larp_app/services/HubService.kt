@@ -97,12 +97,14 @@ class HubService : Service() {
         )
         hubConnection.on(
             "JoinedRoom",
-            { message: String ->
+            { message: String, lostConnection: Boolean ->
                 joinedRoomName = message
-                callback?.showToast("Dołączono do pokoju.")
-                callback?.startGameActivity()
+                if (!lostConnection) {
+                    callback?.showToast("Dołączono do pokoju.")
+                    callback?.startGameActivity()
+                }
             },
-            String::class.java
+            String::class.java, Boolean::class.java
         )
         hubConnection.on(
             "GetChatMessage",
@@ -139,7 +141,9 @@ class HubService : Service() {
             override fun run() {
                 if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
                     //rejoin to room to actualize ConnectionID on server
-                    joinedRoomName?.let { joinJoinedRoom(it) }
+                    if (joinedRoomName != null) {
+                        joinJoinedRoom(joinedRoomName!!, true)
+                    }
                     callback?.hideDialog()
                     timer.cancel()
                     timer.purge()
@@ -203,9 +207,9 @@ class HubService : Service() {
         }
     }
 
-    fun joinJoinedRoom(roomName: String) {
+    fun joinJoinedRoom(roomName: String, lostConnection: Boolean) {
         if (checkHubConnection()) {
-            hubConnection.invoke("JoinJoinedRoom", roomName, token)
+            hubConnection.invoke("JoinJoinedRoom", roomName, lostConnection, token)
         }
     }
 

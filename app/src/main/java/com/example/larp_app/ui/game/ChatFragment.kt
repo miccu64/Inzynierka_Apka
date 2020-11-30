@@ -61,7 +61,7 @@ class ChatFragment : Fragment() {
 
     fun getChatMessage(message: String) {
         // this line adds the data of your EditText and puts in your array
-        arrayList.add(editTxt.text.toString())
+        arrayList.add(message)
         // next thing you have to do is check if your adapter has changed
         adapter.notifyDataSetChanged()
     }

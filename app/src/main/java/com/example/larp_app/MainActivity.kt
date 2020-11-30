@@ -76,7 +76,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     fun joinJoinedRoom(room: String) {
-        hub.joinJoinedRoom(room)
+        hub.joinJoinedRoom(room, false)
     }
 
     fun createRoom(name: String, pass: String, team: Int) {
