@@ -21,6 +21,7 @@ class HubService : Service() {
     private val binder = HubBinder()
     private lateinit var timer: Timer
     private var callback: IHubCallback? = null
+    private var joinedRoomName: String? = null
 
 
     private val server: String = "http://192.168.0.10:45455"
@@ -94,6 +95,22 @@ class HubService : Service() {
             },
             String::class.java
         )
+        hubConnection.on(
+            "JoinedRoom",
+            { message: String ->
+                joinedRoomName = message
+                callback?.showToast("Dołączono do pokoju.")
+                callback?.startGameActivity()
+            },
+            String::class.java
+        )
+        hubConnection.on(
+            "GetChatMessage",
+            { message: String ->
+                callback?.getChatMessage(message)
+            },
+            String::class.java
+        )
         hubConnection.onClosed {
             connect()
         }
@@ -121,6 +138,8 @@ class HubService : Service() {
         val timerTask = object : TimerTask() {
             override fun run() {
                 if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
+                    //rejoin to room to actualize ConnectionID on server
+                    joinedRoomName?.let { joinJoinedRoom(it) }
                     callback?.hideDialog()
                     timer.cancel()
                     timer.purge()
@@ -173,14 +192,14 @@ class HubService : Service() {
             hubConnection.invoke("Login", email, password)
     }
 
-    fun createRoom(roomName: String, password: String) {
+    fun createRoom(roomName: String, password: String, team: Int) {
         if (checkHubConnection())
-            hubConnection.invoke("CreateRoom", roomName, password, token)
+            hubConnection.invoke("CreateRoom", roomName, password, team, token)
     }
 
-    fun joinRoom(roomName: String, password: String) {
+    fun joinRoom(roomName: String, password: String, team: Int) {
         if (checkHubConnection()) {
-            hubConnection.invoke("JoinRoom", roomName, password, token)
+            hubConnection.invoke("JoinRoom", roomName, password, team, token)
         }
     }
 
@@ -188,6 +207,10 @@ class HubService : Service() {
         if (checkHubConnection()) {
             hubConnection.invoke("JoinJoinedRoom", roomName, token)
         }
+    }
+
+    fun sendMessage(message: String, toAll: Boolean) {
+        hubConnection.invoke("SendMessage", message, toAll, token)
     }
 
 }

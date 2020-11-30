@@ -7,4 +7,6 @@ interface IHubCallback {
     fun hideDialog()
     fun showToast(text: String)
     fun goToLogin2()
+    fun startGameActivity()
+    fun getChatMessage(message: String)
 }

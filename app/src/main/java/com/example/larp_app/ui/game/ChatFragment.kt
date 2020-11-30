@@ -1,4 +1,4 @@
-package com.example.larp_app
+package com.example.larp_app.ui.game
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ListView
 import androidx.fragment.app.Fragment
+import com.example.larp_app.GameActivity
+import com.example.larp_app.MainActivity
+import com.example.larp_app.R
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class ChatFragment : Fragment() {
 
@@ -48,12 +52,17 @@ class ChatFragment : Fragment() {
         list.adapter = adapter
 
         btn.setOnClickListener {
-            // this line adds the data of your EditText and puts in your array
-            arrayList.add(editTxt.text.toString())
-            // next thing you have to do is check if your adapter has changed
-            adapter.notifyDataSetChanged()
+            val switch = view.findViewById<SwitchMaterial>(R.id.switch1)
+            (activity as GameActivity).sendMessage(editTxt.text.toString(), switch.isChecked)
             editTxt.text = null
         }
         return view
+    }
+
+    fun getChatMessage(message: String) {
+        // this line adds the data of your EditText and puts in your array
+        arrayList.add(editTxt.text.toString())
+        // next thing you have to do is check if your adapter has changed
+        adapter.notifyDataSetChanged()
     }
 }

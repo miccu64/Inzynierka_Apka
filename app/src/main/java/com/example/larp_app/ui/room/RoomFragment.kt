@@ -37,14 +37,20 @@ class RoomFragment(arr: String) : ListFragment() {
         val password = view.findViewById<EditText>(R.id.roomPassword)
         val create = view.findViewById<Button>(R.id.roomCreate)
         val join = view.findViewById<Button>(R.id.roomJoin)
+        val radioGroup = view.findViewById<RadioGroup>(R.id.radioGroup)
+
         //create.isEnabled = false
         //join.isEnabled = false
 
         create.setOnClickListener {
-            (activity as MainActivity).createRoom(roomName.text.toString(), password.text.toString())
+            val radioButton = radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as RadioButton
+            val team = radioButton.text.toString().toInt()
+            (activity as MainActivity).createRoom(roomName.text.toString(), password.text.toString(), team)
         }
         join.setOnClickListener {
-            (activity as MainActivity).joinRoom(roomName.text.toString(), password.text.toString())
+            val radioButton = radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as RadioButton
+            val team = radioButton.text.toString().toInt()
+            (activity as MainActivity).joinRoom(roomName.text.toString(), password.text.toString(), team)
         }
 
     }

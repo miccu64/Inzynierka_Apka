@@ -30,6 +30,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     lateinit var hub: HubService
     private var bound: Boolean = false
+    private var newActivity: Boolean = false
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -76,27 +77,28 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     fun joinJoinedRoom(room: String) {
         hub.joinJoinedRoom(room)
-        startGameActivity()
     }
 
-    fun createRoom(name: String, pass: String) {
-        hub.createRoom(name, pass)
+    fun createRoom(name: String, pass: String, team: Int) {
+        hub.createRoom(name, pass, team)
     }
 
-    fun joinRoom(name:String, pass: String) {
-        hub.joinRoom(name, pass)
-        startGameActivity()
+    fun joinRoom(name:String, pass: String, team: Int) {
+        hub.joinRoom(name, pass, team)
     }
 
-    private fun startGameActivity() {
+    override fun startGameActivity() {
+        //needed creation of new GameActivity in onDestroy()
+        newActivity = true
         val intent = Intent(this, GameActivity::class.java)
         startActivity(intent)
+        //end current activity
         this.finish()
     }
 
     override fun onStop() {
         super.onStop()
-        if (bound) {
+        if (bound && !newActivity) {
             hub.setCallbacks(null)
             unbindService(connection)
             bound = false
@@ -181,5 +183,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         } catch (e: Exception) { }
     }
 
+    override fun getChatMessage(message: String) { }
 
 }

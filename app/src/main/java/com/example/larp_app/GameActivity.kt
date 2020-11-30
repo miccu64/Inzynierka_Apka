@@ -1,16 +1,19 @@
 package com.example.larp_app
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.widget.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.larp_app.services.HubService
 import com.example.larp_app.services.IHubCallback
+import com.example.larp_app.ui.game.ChatFragment
 import com.example.larp_app.ui.room.SectionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 
@@ -35,6 +38,15 @@ class GameActivity : IHubCallback, AppCompatActivity() {
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             bound = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // Bind to LocalService
+        Intent(this, HubService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -74,9 +86,10 @@ class GameActivity : IHubCallback, AppCompatActivity() {
 
     override fun goToLogin2() { }
 
+    override fun startGameActivity() { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         setContentView(R.layout.activity_game)
         val sectionsPagerAdapter =
@@ -88,8 +101,15 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+    }
 
+    fun sendMessage(message: String, toAll: Boolean) {
+        hub.sendMessage(message, toAll)
+    }
 
+    override fun getChatMessage(message: String) {
+        val fragment: ChatFragment = supportFragmentManager.fragments[1] as ChatFragment
+        fragment.getChatMessage(message)
     }
 
 }

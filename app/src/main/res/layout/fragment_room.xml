@@ -37,11 +37,22 @@
         android:id="@+id/roomCreate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="76dp"
         android:text="Utwórz"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/roomJoin"
+        app:layout_constraintTop_toBottomOf="@+id/roomPassword" />
+
+    <Button
+        android:id="@+id/roomJoin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="76dp"
+        android:text="Dołącz"
+        app:layout_constraintEnd_toStartOf="@+id/roomCreate"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roomPassword" />
 
     <EditText
@@ -56,25 +67,63 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roomName" />
 
-    <Button
-        android:id="@+id/roomJoin"
+    <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="Dołącz"
-        app:layout_constraintEnd_toStartOf="@+id/roomCreate"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="30dp"
+        android:checkedButton="@+id/radio_button_1"
+        android:orientation='horizontal'
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/roomPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/roomPassword">
+
+        <RadioButton
+            android:id="@+id/radio_button_1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="1" />
+
+        <RadioButton
+            android:id="@+id/radio_button_2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="2" />
+
+        <RadioButton
+            android:id="@+id/radio_button_3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="3" />
+
+        <RadioButton
+            android:id="@+id/radio_button_4"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="4" />
+    </RadioGroup>
 
     <TextView
         android:id="@+id/roomText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="296dp"
+        android:layout_marginTop="308dp"
         android:text="Twoje pokoje"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
+        android:text="Dołącz do zespołu o numerze:"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
