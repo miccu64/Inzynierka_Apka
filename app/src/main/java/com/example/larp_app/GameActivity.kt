@@ -13,7 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.larp_app.services.HubService
 import com.example.larp_app.services.IHubCallback
-import com.example.larp_app.ui.game.ChatFragment
+import com.example.larp_app.ui.room.ChatFragment
+import com.example.larp_app.ui.room.MapsFragment
 import com.example.larp_app.ui.room.SectionsPagerAdapter
 import com.google.android.material.tabs.TabLayout
 
@@ -110,6 +111,11 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     override fun getChatMessage(message: String) {
         val fragment: ChatFragment = supportFragmentManager.fragments[1] as ChatFragment
         fragment.getChatMessage(message)
+    }
+
+    override fun showOnMap(coords: String) {
+        val fragment: MapsFragment = supportFragmentManager.fragments[0] as MapsFragment
+        fragment.showOnMap(coords)
     }
 
 }

@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:clipToPadding="false"
     android:focusableInTouchMode="true"
-    tools:context=".ui.game.ChatFragment">
+    tools:context=".ui.room.ChatFragment">
 
     <ListView
         android:layout_width="wrap_content"
@@ -15,9 +15,9 @@
         android:divider="#fff"
         android:layout_height="0dp"
         android:singleLine="false"
-        android:maxLines="2"
         android:inputType="textMultiLine"
         android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll"
         />
 
     <LinearLayout

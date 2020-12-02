@@ -185,4 +185,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
     override fun getChatMessage(message: String) { }
 
+    override fun showOnMap(coords: String) { }
+
 }

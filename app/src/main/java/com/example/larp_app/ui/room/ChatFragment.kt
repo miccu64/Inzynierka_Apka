@@ -1,6 +1,8 @@
-package com.example.larp_app.ui.game
+package com.example.larp_app.ui.room
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +12,12 @@ import android.widget.ImageButton
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import com.example.larp_app.GameActivity
-import com.example.larp_app.MainActivity
 import com.example.larp_app.R
 import com.google.android.material.switchmaterial.SwitchMaterial
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+
 
 class ChatFragment : Fragment() {
 
@@ -52,17 +57,25 @@ class ChatFragment : Fragment() {
         list.adapter = adapter
 
         btn.setOnClickListener {
-            val switch = view.findViewById<SwitchMaterial>(R.id.switch1)
-            (activity as GameActivity).sendMessage(editTxt.text.toString(), switch.isChecked)
-            editTxt.text = null
+            if (editTxt.text.isNotEmpty()) {
+                val switch = view.findViewById<SwitchMaterial>(R.id.switch1)
+                (activity as GameActivity).sendMessage(editTxt.text.toString(), switch.isChecked)
+                editTxt.text = null
+                switch.isChecked = false
+            }
         }
         return view
     }
 
     fun getChatMessage(message: String) {
-        // this line adds the data of your EditText and puts in your array
-        arrayList.add(message)
-        // next thing you have to do is check if your adapter has changed
-        adapter.notifyDataSetChanged()
+        //looper needed to refresh chat when keyboard is on
+        Handler(Looper.getMainLooper()).post {
+            val currentTime2: Date = Calendar.getInstance().time
+            val time: String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+            // this line adds the data of your EditText and puts in your array
+            arrayList.add(time + " " + message)
+            // next thing you have to do is check if your adapter has changed
+            adapter.notifyDataSetChanged()
+        }
     }
 }
