@@ -1,4 +1,4 @@
-package com.example.larp_app.data.model
+package com.example.larp_app.data
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

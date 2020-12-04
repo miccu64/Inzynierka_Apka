@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 class MyPermissions(mCont: Context) {
     private val mContext: Context = mCont
 
-    public fun checkPermissions(): Boolean {
+    fun checkPermissions(): Boolean {
         return (ActivityCompat.checkSelfPermission(
             mContext,
             Manifest.permission.ACCESS_FINE_LOCATION

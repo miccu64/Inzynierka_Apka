@@ -1,9 +1,7 @@
 package com.example.larp_app
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.app.AlertDialog
+import android.content.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -21,7 +19,7 @@ import com.google.android.material.tabs.TabLayout
 
 class GameActivity : IHubCallback, AppCompatActivity() {
 
-    private lateinit var dialog: android.app.AlertDialog
+    private lateinit var dialog: AlertDialog
 
 
 
@@ -69,7 +67,7 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     override fun showDialog(title: String, message: String) {
         Handler(Looper.getMainLooper()).post {
             hideDialog()
-            val builder = android.app.AlertDialog.Builder(this)
+            val builder = AlertDialog.Builder(this)
             builder.setCancelable(true).setTitle(title).setMessage(message)
             dialog = builder.create()
             dialog.setCancelable(true)
@@ -116,6 +114,16 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     override fun showOnMap(coords: String) {
         val fragment: MapsFragment = supportFragmentManager.fragments[0] as MapsFragment
         fragment.showOnMap(coords)
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+            .setTitle("Wyjście z aplikacji")
+            .setMessage("Na pewno chcesz zakończyć działanie aplikacji?")
+            .setPositiveButton("Tak"
+            ) { _, _ -> finish() }
+            .setNegativeButton("Nie", null)
+            .show()
     }
 
 }

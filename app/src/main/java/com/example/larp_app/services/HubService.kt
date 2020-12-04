@@ -1,19 +1,14 @@
 package com.example.larp_app.services
 
-import Location
+import LocationService
 import android.app.Service
-import android.app.TaskInfo
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
-import com.microsoft.signalr.Action1
-import com.microsoft.signalr.Action2
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
 import java.util.*
-import kotlin.concurrent.timerTask
 
 
 class HubService : Service() {
@@ -27,11 +22,11 @@ class HubService : Service() {
     private var taskTimer: TimerTask? = null
 
 
-
     private val server: String = "http://192.168.0.10:45455"
+
     //private val server: String = "http://192.168.2.10:45455"
     private lateinit var hubConnection: HubConnection
-    private lateinit var location: Location
+    private lateinit var location: LocationService
 
     inner class HubBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
@@ -48,17 +43,11 @@ class HubService : Service() {
         hubConnection = HubConnectionBuilder.create("$server/gamehub").build()
         //functions invoked from server
         hubConnection.on(
-            "ErrorMessage",
+            "ShowMessage",
             { message: String ->
                 callback?.showToast(message)
+                callback?.hideDialog()
             }, String::class.java
-        )
-        hubConnection.on(
-            "SuccessMessage",
-            { message: String ->
-                callback?.showToast(message)
-            },
-            String::class.java
         )
         hubConnection.on(
             "RegisterSuccess",
@@ -81,14 +70,6 @@ class HubService : Service() {
                 callback?.loginSuccess(roomList)
             },
             String::class.java, String::class.java
-        )
-        hubConnection.on(
-            "LoginRegisterError",
-            { message: String ->
-                callback?.showToast(message)
-                callback?.hideDialog()
-            },
-            String::class.java
         )
         hubConnection.on(
             "GoToLogin",
@@ -118,7 +99,7 @@ class HubService : Service() {
         hubConnection.onClosed {
             connect()
         }
-        location = Location(this)
+        location = LocationService(this)
         connect()
     }
 
@@ -127,14 +108,7 @@ class HubService : Service() {
     }
 
     private fun checkHubConnection(): Boolean {
-        return if (hubConnection.connectionState == HubConnectionState.CONNECTED)
-            true
-        else {
-            callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
-            //connect()
-            //hubConnection.start()
-            false
-        }
+        return hubConnection.connectionState == HubConnectionState.CONNECTED
     }
 
     private fun resetTimer() {
@@ -147,6 +121,7 @@ class HubService : Service() {
     private fun connect() {
         resetTimer()
         taskTimer = object : TimerTask() {
+            var count = 0
             override fun run() {
                 if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
                     //rejoin to room to actualize ConnectionID on server
@@ -162,7 +137,11 @@ class HubService : Service() {
                 } else {
                     if (location.perms.checkInternetConnection()) {
                         hubConnection.start()
-                    } //callback?.showToast("Uruchom transmisję danych.")
+                    } else if (count == 2)
+                        callback?.showToast("Uruchom transmisję danych.")
+                    if (count == 2)
+                        callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
+                    count++
                 }
             }
         }
@@ -173,12 +152,14 @@ class HubService : Service() {
         resetTimer()
         taskTimer = object : TimerTask() {
             override fun run() {
-                if (checkHubConnection()) {
-                    hubConnection.invoke("UpdateLocation", Location.latitude, Location.longitude, token)
-                } else {
-                    callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
-                    //connect()
-                }
+                if (checkHubConnection())
+                    hubConnection.invoke(
+                        "UpdateLocation",
+                        LocationService.latitude,
+                        LocationService.longitude,
+                        token
+                    )
+                else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
             }
         }
         timer.schedule(taskTimer, 0, 2000)
@@ -200,19 +181,18 @@ class HubService : Service() {
     }
 
     fun joinRoom(roomName: String, password: String, team: Int) {
-        if (checkHubConnection()) {
+        if (checkHubConnection())
             hubConnection.invoke("JoinRoom", roomName, password, team, token)
-        }
     }
 
     fun joinJoinedRoom(roomName: String, lostConnection: Boolean) {
-        if (checkHubConnection()) {
+        if (checkHubConnection())
             hubConnection.invoke("JoinJoinedRoom", roomName, lostConnection, token)
-        }
     }
 
     fun sendMessage(message: String, toAll: Boolean) {
-        hubConnection.invoke("SendMessage", message, toAll, token)
+        if (checkHubConnection())
+            hubConnection.invoke("SendMessage", message, toAll, token)
     }
 
 }

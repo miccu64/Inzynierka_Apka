@@ -10,7 +10,7 @@ import android.os.IBinder
 import com.example.larp_app.others.MyPermissions
 
 
-class Location(mCont: Context) : Service(), LocationListener {
+class LocationService(mCont: Context) : Service(), LocationListener {
     var isGPSEnabled = false
     var isNetworkEnabled = false
     var locations : Location? = null
