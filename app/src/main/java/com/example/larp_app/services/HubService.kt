@@ -22,9 +22,9 @@ class HubService : Service() {
     private var taskTimer: TimerTask? = null
 
 
-    private val server: String = "http://192.168.0.10:45455"
+    //private val server: String = "http://192.168.0.10:45455"
 
-    //private val server: String = "http://192.168.2.10:45455"
+    private val server: String = "http://192.168.2.10:45455"
     private lateinit var hubConnection: HubConnection
     private lateinit var location: LocationService
 
@@ -35,6 +35,11 @@ class HubService : Service() {
 
     fun setCallbacks(call: IHubCallback?) {
         callback = call
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        resetTimer()
+        return super.onUnbind(intent)
     }
 
     override fun onCreate() {
@@ -67,6 +72,7 @@ class HubService : Service() {
             "LoginSuccess",
             { tok: String, roomList: String ->
                 token = tok
+                callback?.hideDialog()
                 callback?.loginSuccess(roomList)
             },
             String::class.java, String::class.java
@@ -166,28 +172,40 @@ class HubService : Service() {
     }
 
     fun register(email: String, name: String, password: String) {
-        if (checkHubConnection())
+        if (checkHubConnection()) {
+            callback?.showDialog("", "Rejestrowanie...")
             hubConnection.invoke("RegisterNewUser", email, name, password)
+        }
     }
 
     fun login(email: String, password: String) {
-        if (checkHubConnection())
+        if (checkHubConnection()) {
+            callback?.showDialog("", "Logowanie...")
             hubConnection.invoke("Login", email, password)
+        }
     }
 
     fun createRoom(roomName: String, password: String, team: Int) {
-        if (checkHubConnection())
+        if (checkHubConnection()) {
+            callback?.showDialog("", "Tworzenie pokoju...")
             hubConnection.invoke("CreateRoom", roomName, password, team, token)
+        }
     }
 
     fun joinRoom(roomName: String, password: String, team: Int) {
-        if (checkHubConnection())
+        if (checkHubConnection()) {
+            callback?.showDialog("", "Dołączanie do pokoju...")
             hubConnection.invoke("JoinRoom", roomName, password, team, token)
+        }
     }
 
     fun joinJoinedRoom(roomName: String, lostConnection: Boolean) {
-        if (checkHubConnection())
+        if (checkHubConnection()) {
+            if (!lostConnection) {
+                callback?.showDialog("", "Dołączanie do pokoju...")
+            }
             hubConnection.invoke("JoinJoinedRoom", roomName, lostConnection, token)
+        }
     }
 
     fun sendMessage(message: String, toAll: Boolean) {

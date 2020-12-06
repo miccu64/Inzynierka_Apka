@@ -10,7 +10,8 @@
     android:focusable="false"
     android:focusableInTouchMode="false"
     android:orientation="horizontal"
-    tools:context=".ui.room.RoomFragment">
+    tools:context=".ui.room.RoomFragment"
+    android:screenOrientation="portrait">
 
     <ListView
         android:id="@android:id/list"

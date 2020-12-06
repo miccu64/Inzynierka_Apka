@@ -120,8 +120,13 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Wyjście z aplikacji")
             .setMessage("Na pewno chcesz zakończyć działanie aplikacji?")
-            .setPositiveButton("Tak"
-            ) { _, _ -> finish() }
+            .setPositiveButton(
+                "Tak"
+            ) { _, _ ->
+                val myService = Intent(this@GameActivity, HubService::class.java)
+                hub.stopService(myService)
+                finish()
+            }
             .setNegativeButton("Nie", null)
             .show()
     }

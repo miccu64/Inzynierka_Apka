@@ -119,12 +119,10 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     fun login(login: String, pass: String) {
-        showDialog("", "Logowanie...")
         hub.login(login, pass)
     }
 
     fun register(login: String, email: String, pass: String) {
-        showDialog("", "Rejestrowanie...")
         hub.register(email, login, pass)
     }
 
