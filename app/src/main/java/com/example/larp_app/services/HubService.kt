@@ -58,7 +58,7 @@ class HubService : Service() {
             "RegisterSuccess",
             { message: String ->
                 callback?.showDialog(message, "Możesz się zalogować")
-                callback?.goToLogin2()
+                callback?.goToLogin()
             }, String::class.java
         )
         hubConnection.on(
@@ -81,7 +81,7 @@ class HubService : Service() {
             "GoToLogin",
             { message: String ->
                 callback?.showToast(message)
-                callback?.goToLogin2()
+                callback?.goToLogin()
             },
             String::class.java
         )
@@ -117,7 +117,7 @@ class HubService : Service() {
         return hubConnection.connectionState == HubConnectionState.CONNECTED
     }
 
-    private fun resetTimer() {
+    fun resetTimer() {
         taskTimer?.cancel()
         timer.purge()
         timer.cancel()
@@ -158,13 +158,13 @@ class HubService : Service() {
         resetTimer()
         taskTimer = object : TimerTask() {
             override fun run() {
-                if (checkHubConnection())
-                    hubConnection.invoke(
-                        "UpdateLocation",
-                        LocationService.latitude,
-                        LocationService.longitude,
-                        token
-                    )
+                if (checkHubConnection()) {
+                    val lat = LocationService.latitude
+                    val lon = LocationService.longitude
+                    if (lat == lon && lat == 0.0)
+                        callback?.showToast("Nie można zdobyć lokalizacji")
+                    else hubConnection.invoke("UpdateLocation", lat, lon, token)
+                }
                 else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
             }
         }
@@ -213,4 +213,23 @@ class HubService : Service() {
             hubConnection.invoke("SendMessage", message, toAll, token)
     }
 
+    fun giveAdmin(nick: String) {
+        if (checkHubConnection())
+            hubConnection.invoke("GiveAdmin", nick, token)
+    }
+
+    fun throwPlayer(nick: String) {
+        if (checkHubConnection())
+            hubConnection.invoke("ThrowPlayer", joinedRoomName, nick, token)
+    }
+
+    fun leaveRoom() {
+        if (checkHubConnection())
+            hubConnection.invoke("LeaveRoom", joinedRoomName, token)
+    }
+
+    fun deleteRoom() {
+        if (checkHubConnection())
+            hubConnection.invoke("DeleteRoom", joinedRoomName, token)
+    }
 }

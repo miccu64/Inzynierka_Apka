@@ -33,8 +33,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".GameActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".GameActivity">
         </activity>
 
         <service

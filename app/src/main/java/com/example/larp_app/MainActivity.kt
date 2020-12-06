@@ -28,7 +28,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     private lateinit var perms: MyPermissions
     private lateinit var dialog: android.app.AlertDialog
 
-    lateinit var hub: HubService
+    private lateinit var hub: HubService
     private var bound: Boolean = false
     private var newActivity: Boolean = false
 
@@ -88,7 +88,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     override fun startGameActivity() {
-        //needed creation of new GameActivity in onDestroy()
+        //needed creation of new GameActivity in onStop()
         newActivity = true
         val intent = Intent(this, GameActivity::class.java)
         startActivity(intent)
@@ -133,15 +133,14 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         ft.commit()
     }
 
-    fun goToLogin(view: View) {
-        //go back to login
-        onBackPressed()
-    }
-
-    override fun goToLogin2() {
+    override fun goToLogin() {
         Handler(Looper.getMainLooper()).post {
             onBackPressed()
         }
+    }
+
+    fun goToLogin2(view: View) {
+        onBackPressed()
     }
 
     override fun showToast(text: String) {

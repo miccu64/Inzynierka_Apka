@@ -6,6 +6,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.text.InputType
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
@@ -20,10 +24,9 @@ import com.google.android.material.tabs.TabLayout
 class GameActivity : IHubCallback, AppCompatActivity() {
 
     private lateinit var dialog: AlertDialog
+    private var newActivity: Boolean = false
 
-
-
-    lateinit var hub: HubService
+    private lateinit var hub: HubService
     private var bound: Boolean = false
 
     private val connection = object : ServiceConnection {
@@ -50,11 +53,69 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     }
 
     override fun onStop() {
-        super.onStop()
-        if (bound) {
+        if (bound && !newActivity) {
             hub.setCallbacks(null)
             unbindService(connection)
             bound = false
+        }
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        //end sending location
+        hub.resetTimer()
+        super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_gameactivity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_giveadmin -> {
+            val builder = AlertDialog.Builder(this).setTitle("Przekaż uprawnienia (jeśli dotyczy)")
+            val input = EditText(this)
+            input.inputType = InputType.TYPE_CLASS_TEXT
+            builder.setView(input).setPositiveButton("OK") { _, _ ->
+                if (input.text.toString().isNotEmpty())
+                    hub.giveAdmin(input.text.toString())
+            }
+            builder.setNegativeButton("Anuluj") { dialog, _ -> dialog.cancel() }.show()
+            true
+        }
+        R.id.action_leave -> {
+            hub.leaveRoom()
+            goToLogin()
+            true
+        }
+        R.id.action_return -> {
+            goToLogin()
+            true
+        }
+        R.id.action_delete -> {
+            AlertDialog.Builder(this)
+                .setTitle("Usunąć pokój? (jeśli jesteś adminem)")
+                .setPositiveButton("Tak") { _, _ ->
+                    hub.deleteRoom()
+                }
+                .setNegativeButton("Nie", null)
+                .show()
+            true
+        }
+        R.id.action_throw -> {
+            val builder = AlertDialog.Builder(this).setTitle("Wyrzuć gracza (jeśli jesteś adminem)")
+            val input = EditText(this)
+            input.inputType = InputType.TYPE_CLASS_TEXT
+            builder.setView(input).setPositiveButton("OK") { _, _ ->
+                if (input.text.toString().isNotEmpty())
+                    hub.throwPlayer(input.text.toString())
+            }
+            builder.setNegativeButton("Anuluj") { dialog, _ -> dialog.cancel() }.show()
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
         }
     }
 
@@ -83,7 +144,14 @@ class GameActivity : IHubCallback, AppCompatActivity() {
 
     override fun loginSuccess(roomList: String) { }
 
-    override fun goToLogin2() { }
+    override fun goToLogin() {
+        //needed creation of new GameActivity in onDestroy()
+        newActivity = true
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        //end current activity
+        this.finish()
+    }
 
     override fun startGameActivity() { }
 
@@ -120,9 +188,7 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Wyjście z aplikacji")
             .setMessage("Na pewno chcesz zakończyć działanie aplikacji?")
-            .setPositiveButton(
-                "Tak"
-            ) { _, _ ->
+            .setPositiveButton("Tak") { _, _ ->
                 val myService = Intent(this@GameActivity, HubService::class.java)
                 hub.stopService(myService)
                 finish()
@@ -130,5 +196,4 @@ class GameActivity : IHubCallback, AppCompatActivity() {
             .setNegativeButton("Nie", null)
             .show()
     }
-
 }

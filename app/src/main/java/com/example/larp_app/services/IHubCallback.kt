@@ -6,10 +6,10 @@ interface IHubCallback {
     fun showDialog(title: String, message: String)
     fun hideDialog()
     fun showToast(text: String)
+    fun goToLogin()
 
     //MainActivity funs
     fun loginSuccess(roomList: String)
-    fun goToLogin2()
     fun startGameActivity()
 
     //GameActivity funs
