@@ -44,27 +44,22 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     }
 
     override fun onStart() {
-        super.onStart()
-
         // Bind to LocalService
         Intent(this, HubService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+        super.onStart()
     }
 
     override fun onStop() {
         if (bound && !newActivity) {
+            //end sending location
+            hub.resetTimer()
             hub.setCallbacks(null)
             unbindService(connection)
             bound = false
         }
         super.onStop()
-    }
-
-    override fun onDestroy() {
-        //end sending location
-        hub.resetTimer()
-        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -86,7 +81,6 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         }
         R.id.action_leave -> {
             hub.leaveRoom()
-            goToLogin()
             true
         }
         R.id.action_return -> {
@@ -156,8 +150,6 @@ class GameActivity : IHubCallback, AppCompatActivity() {
     override fun startGameActivity() { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_game)
         val sectionsPagerAdapter =
             SectionsPagerAdapter(
@@ -168,6 +160,7 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+        super.onCreate(savedInstanceState)
     }
 
     fun sendMessage(message: String, toAll: Boolean) {

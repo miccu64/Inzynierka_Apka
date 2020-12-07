@@ -210,12 +210,12 @@ class HubService : Service() {
 
     fun sendMessage(message: String, toAll: Boolean) {
         if (checkHubConnection())
-            hubConnection.invoke("SendMessage", message, toAll, token)
+            hubConnection.invoke("SendMessage", message, joinedRoomName, toAll, token)
     }
 
     fun giveAdmin(nick: String) {
         if (checkHubConnection())
-            hubConnection.invoke("GiveAdmin", nick, token)
+            hubConnection.invoke("GiveAdmin", joinedRoomName, nick, token)
     }
 
     fun throwPlayer(nick: String) {

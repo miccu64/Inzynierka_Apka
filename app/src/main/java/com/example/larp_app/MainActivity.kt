@@ -50,7 +50,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         //ignores every certificate of SSL!!!!!!!!!!!!!!
@@ -58,12 +57,10 @@ class MainActivity : IHubCallback, AppCompatActivity() {
 
         perms = MyPermissions(this)
         grantPermissions() //exitProcess(-1)
-
+        super.onCreate(savedInstanceState)
     }
 
     override fun onStart() {
-        super.onStart()
-
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
         //addToBackStack() allows to use back button to back to login from register
         ft.replace(R.id.fragment_container, LoginFragment()).addToBackStack(null)
@@ -73,6 +70,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         Intent(this, HubService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+        super.onStart()
     }
 
     fun joinJoinedRoom(room: String) {
@@ -97,12 +95,12 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     }
 
     override fun onStop() {
-        super.onStop()
         if (bound && !newActivity) {
             hub.setCallbacks(null)
             unbindService(connection)
             bound = false
         }
+        super.onStop()
     }
 
     private fun grantPermissions(): Boolean {
