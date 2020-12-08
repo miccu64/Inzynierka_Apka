@@ -51,15 +51,17 @@ class GameActivity : IHubCallback, AppCompatActivity() {
         super.onStart()
     }
 
-    override fun onStop() {
-        if (bound && !newActivity) {
+    override fun onDestroy() {
+        if (bound) {
             //end sending location
             hub.resetTimer()
-            hub.setCallbacks(null)
             unbindService(connection)
+            if (!newActivity) {
+                hub.setCallbacks(null)
+            }
             bound = false
         }
-        super.onStop()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -1,15 +1,13 @@
 package com.example.larp_app.ui.room
 
-import androidx.fragment.app.Fragment
-
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.larp_app.R
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -23,8 +21,8 @@ class MapsFragment : Fragment() {
     private lateinit var map: SupportMapFragment
     private val markers = mutableMapOf<String, Marker>()
 
-    fun showOnMap(coords: String) {
-        val arr = JSONArray(coords)
+    fun showOnMap(arrString: String) {
+        val arr = JSONArray(arrString)
         for (i in 0 until arr.length()) {
             val el = arr[i] as JSONObject
             val name = el.getString("PlayerName") as String

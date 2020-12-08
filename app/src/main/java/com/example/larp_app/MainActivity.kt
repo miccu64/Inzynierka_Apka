@@ -88,6 +88,7 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     override fun startGameActivity() {
         //needed creation of new GameActivity in onStop()
         newActivity = true
+        hideDialog()
         val intent = Intent(this, GameActivity::class.java)
         startActivity(intent)
         //end current activity
