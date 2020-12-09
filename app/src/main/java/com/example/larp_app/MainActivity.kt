@@ -52,9 +52,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_main)
 
-        //ignores every certificate of SSL!!!!!!!!!!!!!!
-        //NukeSSLCerts.nuke()
-
         perms = MyPermissions(this)
         grantPermissions() //exitProcess(-1)
         super.onCreate(savedInstanceState)
