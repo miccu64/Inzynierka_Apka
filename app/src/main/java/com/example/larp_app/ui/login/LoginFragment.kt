@@ -14,10 +14,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.larp_app.MainActivity
 import com.example.larp_app.R
+import com.example.larp_app.ui.validity.LoginPassViewModel
 
 class LoginFragment : Fragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var loginPassViewModel: LoginPassViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,8 +30,8 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        loginPassViewModel = ViewModelProvider(this)
+            .get(LoginPassViewModel::class.java)
 
         val usernameEditText = view.findViewById<EditText>(R.id.emailLogin)
         val passwordEditText = view.findViewById<EditText>(R.id.passwordLogin)
@@ -38,7 +39,8 @@ class LoginFragment : Fragment() {
 
         loginButton.isEnabled = true
 
-        loginViewModel.loginFormState.observe(this,
+        loginPassViewModel.loginPassFormState.observe(
+            viewLifecycleOwner,
             Observer { loginFormState ->
                 if (loginFormState == null) {
                     return@Observer
@@ -58,7 +60,7 @@ class LoginFragment : Fragment() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) { }
 
             override fun afterTextChanged(s: Editable) {
-                loginViewModel.loginDataChanged(
+                loginPassViewModel.loginDataChanged(
                     usernameEditText.text.toString(),
                     passwordEditText.text.toString()
                 )

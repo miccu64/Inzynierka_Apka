@@ -5,22 +5,17 @@
 
     <item
         android:id="@+id/action_return"
-        android:title="Wróć do logowania">
-    </item>
+        android:title="@string/back_login"></item>
     <item
         android:id="@+id/action_leave"
-        android:title="Opuść pokój">
-    </item>
+        android:title="@string/leave"></item>
     <item
         android:id="@+id/action_throw"
-        android:title="Wyrzuć gracza">
-    </item>
+        android:title="@string/throw_player"></item>
     <item
         android:id="@+id/action_delete"
-        android:title="Usuń pokój">
-    </item>
+        android:title="@string/delete_room"></item>
     <item
         android:id="@+id/action_giveadmin"
-        android:title="Przekaż administrację">
-    </item>
+        android:title="@string/give_admin"></item>
 </menu>

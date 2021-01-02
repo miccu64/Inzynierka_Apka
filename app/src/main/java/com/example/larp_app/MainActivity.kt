@@ -53,14 +53,13 @@ class MainActivity : IHubCallback, AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         perms = MyPermissions(this)
-        grantPermissions() //exitProcess(-1)
+        grantPermissions()
         super.onCreate(savedInstanceState)
     }
 
     override fun onStart() {
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        //addToBackStack() allows to use back button to back to login from register
-        ft.replace(R.id.fragment_container, LoginFragment()).addToBackStack(null)
+        ft.replace(R.id.fragment_container, LoginFragment())
         ft.commit()
 
         // Bind to LocalService

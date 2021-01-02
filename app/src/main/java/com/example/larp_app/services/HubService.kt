@@ -12,19 +12,20 @@ import java.util.*
 
 
 class HubService : Service() {
-    var token: String? = null
+    companion object {
+        var token: String? = null
+        private var timer: Timer = Timer()
+        private var callback: IHubCallback? = null
+        private var joinedRoomName: String? = null
+        private var taskTimer: TimerTask? = null
+    }
 
     // Binder given to clients
     private val binder = HubBinder()
-    private var timer: Timer = Timer()
-    private var callback: IHubCallback? = null
-    private var joinedRoomName: String? = null
-    private var taskTimer: TimerTask? = null
 
+    private val server: String = "http://192.168.2.5:45455"
+    //private val server: String = "https://larpserver.herokuapp.com"
 
-    //private val server: String = "http://192.168.0.10:45455"
-
-    private val server: String = "https://larpserver.herokuapp.com"
     private lateinit var hubConnection: HubConnection
     private lateinit var location: LocationService
 

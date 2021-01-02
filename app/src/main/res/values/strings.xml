@@ -1,15 +1,4 @@
 <resources>
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="title_activity_game">LARP App</string>
-
-    <string name="tab_text_1">Mapa</string>
-    <string name="tab_text_2">Chat</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -25,4 +14,35 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
+    <string name="prompt_email">Email</string>
+    <string name="invalid_username_password">Wprowadź przynajmniej 4 znaki</string>
+    <string name="title_activity_game">LARP App</string>
+    <string name="tab_text_1">Mapa</string>
+    <string name="tab_text_2">Chat</string>
+    <string name="login_text">Zaloguj się</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="password_hint">Hasło</string>
+    <string name="goto_register">Przejdź do rejestracji</string>
+    <string name="sendto">Wszyscy</string>
+    <string name="message">Wpisz wiadomość</string>
+    <string name="img_send">Wyślij</string>
+    <string name="register_name">Nazwa</string>
+    <string name="register_password">Hasło</string>
+    <string name="register">Zarejestruj się</string>
+    <string name="goto_login">Przejdź do logowania</string>
+    <string name="roomname">Nazwa pokoju</string>
+    <string name="create">Utwórz</string>
+    <string name="join">Dołącz</string>
+    <string name="room_password">Hasło pokoju</string>
+    <string name="team1">1</string>
+    <string name="team2">2</string>
+    <string name="team3">3</string>
+    <string name="team4">4</string>
+    <string name="rooms">Twoje pokoje</string>
+    <string name="join_team">Dołącz do zespołu o numerze:</string>
+    <string name="back_login">Wróć do logowania</string>
+    <string name="leave">Opuść pokój</string>
+    <string name="throw_player">Wyrzuć gracza</string>
+    <string name="delete_room">Usuń pokój</string>
+    <string name="give_admin">Przekaż administrację</string>
 </resources>

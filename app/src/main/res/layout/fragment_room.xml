@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
         android:ems="10"
-        android:hint="Nazwa pokoju"
+        android:hint="@string/roomname"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
-        android:text="Utwórz"
+        android:text="@string/create"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/roomJoin"
@@ -50,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
-        android:text="Dołącz"
+        android:text="@string/join"
         app:layout_constraintEnd_toStartOf="@+id/roomCreate"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:hint="Hasło pokoju"
+        android:hint="@string/room_password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,25 +83,25 @@
             android:id="@+id/radio_button_1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="1" />
+            android:text="@string/team1" />
 
         <RadioButton
             android:id="@+id/radio_button_2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="2" />
+            android:text="@string/team2" />
 
         <RadioButton
             android:id="@+id/radio_button_3"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="3" />
+            android:text="@string/team3" />
 
         <RadioButton
             android:id="@+id/radio_button_4"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="4" />
+            android:text="@string/team4" />
     </RadioGroup>
 
     <TextView
@@ -109,7 +109,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="308dp"
-        android:text="Twoje pokoje"
+        android:text="@string/rooms"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -121,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
-        android:text="Dołącz do zespołu o numerze:"
+        android:text="@string/join_team"
         app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -70,10 +70,9 @@ class ChatFragment : Fragment() {
     fun getChatMessage(message: String) {
         //looper needed to refresh chat when keyboard is on
         Handler(Looper.getMainLooper()).post {
-            val currentTime2: Date = Calendar.getInstance().time
             val time: String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
             // this line adds the data of your EditText and puts in your array
-            arrayList.add(time + " " + message)
+            arrayList.add("$time $message")
             // next thing you have to do is check if your adapter has changed
             adapter.notifyDataSetChanged()
         }
