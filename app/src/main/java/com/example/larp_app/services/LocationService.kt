@@ -1,3 +1,5 @@
+package com.example.larp_app.services
+
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
@@ -11,33 +13,37 @@ import com.example.larp_app.others.MyPermissions
 
 
 class LocationService(mCont: Context) : Service(), LocationListener {
-    var isGPSEnabled = false
-    var isNetworkEnabled = false
-    var locations : Location? = null
+    private var isGPSEnabled = false
+    private var isNetworkEnabled = false
+    private var locations: Location? = null
     private var locationManager: LocationManager? = null
     private val mContext: Context = mCont
     val perms: MyPermissions = MyPermissions(mCont)
 
-
+    //SuppressLint used, bcs in another place there are checked permissions
     @SuppressLint("MissingPermission")
-    private fun getLocation(): Location? {
+    private fun getLocation() {
         try {
             locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             isGPSEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
             isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-            if (!isGPSEnabled && !isNetworkEnabled) { // no network provider is enabled
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                // no network provider is enabled
+
             } else {
                 // First get location from Network Provider
                 if (isNetworkEnabled) {
-                    if (!perms.checkPermissions()) return null
+                    if (!perms.checkPermissions())
+                        return
                     locationManager!!.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
                         minTime,
                         minDistance,
                         this
                     )
-                    locations = locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                    locations =
+                        locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 }
 
                 if (isGPSEnabled && locations == null) {
@@ -55,7 +61,6 @@ class LocationService(mCont: Context) : Service(), LocationListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return locations
     }
 
     override fun onLocationChanged(location: Location) {
@@ -63,31 +68,40 @@ class LocationService(mCont: Context) : Service(), LocationListener {
         longitude = location.longitude
         locations = location
     }
-    override fun onProviderDisabled(provider: String) {}
-    override fun onProviderEnabled(provider: String) {}
+
+    override fun onProviderDisabled(provider: String) {
+        getLocation()
+    }
+
+    override fun onProviderEnabled(provider: String) {
+        getLocation()
+    }
+
     override fun onStatusChanged(
         provider: String,
         status: Int,
         extras: Bundle
     ) {
+        getLocation()
     }
 
     override fun onBind(arg0: Intent): IBinder? {
         return null
     }
 
-    //exists only one companion object between different instances of the same class
+    //singleton
     companion object {
         var latitude = 0.0
         var longitude = 0.0
+
         //min distance to change updates in meters
         private const val minDistance: Float = 0.1F // 0.1 meters (distance accuracy)
+
         //min time between updates in milliseconds
-        private const val minTime = 1000 * 1 .toLong() // every 1 second update
+        private const val minTime = 1000 * 2.toLong() // every 2 seconds update
     }
 
     init {
-
         getLocation()
     }
 }
