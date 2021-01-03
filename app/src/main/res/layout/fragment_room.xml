@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="false"
@@ -86,26 +85,22 @@
             android:text="@string/team1" />
 
         <RadioButton
-            android:id="@+id/radio_button_2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/team2" />
 
         <RadioButton
-            android:id="@+id/radio_button_3"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/team3" />
 
         <RadioButton
-            android:id="@+id/radio_button_4"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/team4" />
     </RadioGroup>
 
     <TextView
-        android:id="@+id/roomText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="308dp"
@@ -117,7 +112,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
