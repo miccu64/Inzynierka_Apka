@@ -8,69 +8,83 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.widget.Toast
 import com.example.larp_app.others.MyPermissions
 
 
-class LocationService(mCont: Context) : Service(), LocationListener {
-    private var isGPSEnabled = false
-    private var isNetworkEnabled = false
-    private var locations: Location? = null
-    private var locationManager: LocationManager? = null
+class LocationService(mCont: Context, fromGPS: Boolean) : Service(), LocationListener {
     private val mContext: Context = mCont
-    val perms: MyPermissions = MyPermissions(mCont)
+    private var provider: String = if (fromGPS) {
+        LocationManager.GPS_PROVIDER
+    } else LocationManager.NETWORK_PROVIDER
+
+    //min distance to change updates in meters
+    private val minDistance: Float = 0.1F // 0.1 meters (distance accuracy)
+
+    //min time between updates in milliseconds
+    private val minTime = 1000 * 1.toLong() // every 1 second update
+
+    private val perms: MyPermissions = MyPermissions(mCont)
+
+    var locations: Location? = null
+    private lateinit var locationManager: LocationManager
+    private var isRunning = false
+
+    fun checkStatus(): Boolean {
+        return isRunning && locations != null
+    }
+
+    fun start() {
+        getLocation()
+    }
+
+    fun stop() {
+        if (isRunning) {
+            locationManager.removeUpdates(this)
+            isRunning = false
+        }
+    }
+
+    private fun makeToast(text: String) {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(mContext, text, Toast.LENGTH_LONG).show()
+        }
+    }
 
     //SuppressLint used, bcs in another place there are checked permissions
     @SuppressLint("MissingPermission")
     private fun getLocation() {
         try {
             locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            isGPSEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            isNetworkEnabled = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                // no network provider is enabled
-
-            } else {
-                // First get location from Network Provider
-                if (isNetworkEnabled) {
-                    if (!perms.checkPermissions())
-                        return
-                    locationManager!!.requestLocationUpdates(
-                        LocationManager.NETWORK_PROVIDER,
-                        minTime,
-                        minDistance,
-                        this
-                    )
-                    locations =
-                        locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                }
-
-                if (isGPSEnabled && locations == null) {
-                    locationManager!!.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER,
-                        minTime,
-                        minDistance,
-                        this
-                    )
-                    locations = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                }
-                latitude = locations!!.latitude
-                longitude = locations!!.longitude
+            if (!perms.checkPermissions()) {
+                makeToast("Musisz udzielić uprawnienia dla aplikacji")
+                return
             }
+            if (!locationManager.isProviderEnabled(provider)) {
+                isRunning = false
+                makeToast("Musisz uruchomić lokalizację")
+                return
+            }
+            //update location on change automatically
+            Handler(Looper.getMainLooper()).post {
+                locationManager.requestLocationUpdates(provider, minTime, minDistance, this)
+            }
+            locations = locationManager.getLastKnownLocation(provider)
+            isRunning = true
         } catch (e: Exception) {
-            e.printStackTrace()
+            isRunning = false
         }
     }
 
     override fun onLocationChanged(location: Location) {
-        latitude = location.latitude
-        longitude = location.longitude
         locations = location
     }
 
     override fun onProviderDisabled(provider: String) {
-        getLocation()
     }
 
     override fun onProviderEnabled(provider: String) {
@@ -82,26 +96,9 @@ class LocationService(mCont: Context) : Service(), LocationListener {
         status: Int,
         extras: Bundle
     ) {
-        getLocation()
     }
 
     override fun onBind(arg0: Intent): IBinder? {
         return null
-    }
-
-    //singleton
-    companion object {
-        var latitude = 0.0
-        var longitude = 0.0
-
-        //min distance to change updates in meters
-        private const val minDistance: Float = 0.1F // 0.1 meters (distance accuracy)
-
-        //min time between updates in milliseconds
-        private const val minTime = 1000 * 2.toLong() // every 2 seconds update
-    }
-
-    init {
-        getLocation()
     }
 }

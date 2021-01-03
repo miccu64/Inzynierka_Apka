@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import com.example.larp_app.others.MyPermissions
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
@@ -12,7 +13,7 @@ import java.util.*
 
 class HubService : Service() {
     companion object {
-        var token: String? = null
+        private var token: String? = null
         private var timer: Timer = Timer()
         private var callback: IHubCallback? = null
         private var joinedRoomName: String? = null
@@ -26,7 +27,8 @@ class HubService : Service() {
     //private val server: String = "https://larpserver.herokuapp.com"
 
     private lateinit var hubConnection: HubConnection
-    private lateinit var location: LocationService
+    private val perms = MyPermissions(this)
+    private lateinit var location: GPSNetworkLocation
 
     inner class HubBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
@@ -80,6 +82,9 @@ class HubService : Service() {
         hubConnection.on(
             "GoToLogin",
             { message: String ->
+                location.stop()
+                resetTimer()
+                joinedRoomName = null
                 callback?.showToast(message)
                 callback?.goToLogin()
             },
@@ -105,7 +110,7 @@ class HubService : Service() {
         hubConnection.onClosed {
             connect()
         }
-        location = LocationService(this)
+        location = GPSNetworkLocation(this)
         connect()
     }
 
@@ -126,28 +131,24 @@ class HubService : Service() {
 
     private fun connect() {
         resetTimer()
+        if (hubConnection.connectionState != HubConnectionState.CONNECTED) {
+            if (!perms.checkInternetConnection()) {
+                callback?.showToast("Uruchom transmisję danych.")
+            } else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
+        }
+
         taskTimer = object : TimerTask() {
-            var count = 0
             override fun run() {
                 if (hubConnection.connectionState == HubConnectionState.CONNECTED) {
-                    //rejoin to room to actualize ConnectionID on server
+                    callback?.hideDialog()
+                    //rejoin to room to actualize ConnectionID on server if were in game
                     if (joinedRoomName != null) {
                         joinJoinedRoom(joinedRoomName!!, true)
-                    }
-                    callback?.hideDialog()
-                    //send location again if in game
-                    if (joinedRoomName != null)
+                        //send location again
                         sendLocation()
-                    //end reconnect task
-                    else resetTimer()
-                } else {
-                    if (location.perms.checkInternetConnection()) {
-                        hubConnection.start()
-                    } else if (count == 2)
-                        callback?.showToast("Uruchom transmisję danych.")
-                    if (count == 2)
-                        callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
-                    count++
+                    } else resetTimer() //end reconnect task
+                } else if (perms.checkInternetConnection()) {
+                    hubConnection.start()
                 }
             }
         }
@@ -159,13 +160,11 @@ class HubService : Service() {
         taskTimer = object : TimerTask() {
             override fun run() {
                 if (checkHubConnection()) {
-                    val lat = LocationService.latitude
-                    val lon = LocationService.longitude
-                    if (lat == lon && lat == 0.0)
-                        callback?.showToast("Nie można zdobyć lokalizacji")
-                    else hubConnection.invoke("UpdateLocation", lat, lon, token)
-                }
-                else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
+                    val loc = location.getLocation()
+                    if (loc != null) {
+                        hubConnection.invoke("UpdateLocation", loc.latitude, loc.longitude, token)
+                    }
+                } else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
             }
         }
         timer.schedule(taskTimer, 0, 2000)
