@@ -66,7 +66,6 @@ class LocationService(mCont: Context, fromGPS: Boolean) : Service(), LocationLis
             }
             if (!locationManager.isProviderEnabled(provider)) {
                 isRunning = false
-                makeToast("Musisz uruchomić lokalizację")
                 return
             }
             //update location on change automatically
