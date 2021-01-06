@@ -33,27 +33,6 @@ class LocationService(mCont: Context, fromGPS: Boolean) : Service(), LocationLis
     private lateinit var locationManager: LocationManager
     private var isRunning = false
 
-    fun checkStatus(): Boolean {
-        return isRunning && locations != null
-    }
-
-    fun start() {
-        getLocation()
-    }
-
-    fun stop() {
-        if (isRunning) {
-            locationManager.removeUpdates(this)
-            isRunning = false
-        }
-    }
-
-    private fun makeToast(text: String) {
-        Handler(Looper.getMainLooper()).post {
-            Toast.makeText(mContext, text, Toast.LENGTH_LONG).show()
-        }
-    }
-
     //SuppressLint used, bcs in another place there are checked permissions
     @SuppressLint("MissingPermission")
     private fun getLocation() {
@@ -76,6 +55,27 @@ class LocationService(mCont: Context, fromGPS: Boolean) : Service(), LocationLis
             isRunning = true
         } catch (e: Exception) {
             isRunning = false
+        }
+    }
+
+    fun checkStatus(): Boolean {
+        return isRunning && locations != null
+    }
+
+    fun start() {
+        getLocation()
+    }
+
+    fun stop() {
+        if (isRunning) {
+            locationManager.removeUpdates(this)
+            isRunning = false
+        }
+    }
+
+    private fun makeToast(text: String) {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(mContext, text, Toast.LENGTH_LONG).show()
         }
     }
 
