@@ -37,7 +37,7 @@ class LoginFragment : Fragment() {
         val passwordEditText = view.findViewById<EditText>(R.id.passwordLogin)
         val loginButton = view.findViewById<Button>(R.id.login)
 
-        loginButton.isEnabled = true
+        loginButton.isEnabled = false
 
         loginPassViewModel.loginPassFormState.observe(
             viewLifecycleOwner,
