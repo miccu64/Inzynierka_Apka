@@ -23,8 +23,8 @@ class HubService : Service() {
     // Binder given to clients
     private val binder = HubBinder()
 
-    private val server: String = "http://192.168.2.2:45455"
-    //private val server: String = "https://larpserver.herokuapp.com"
+    //private val server: String = "http://192.168.2.2:45455"
+    private val server: String = "https://larpserver.herokuapp.com"
 
     private lateinit var hubConnection: HubConnection
     private val perms = MyPermissions(this)
