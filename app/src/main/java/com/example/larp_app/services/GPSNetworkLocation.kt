@@ -10,7 +10,6 @@ class GPSNetworkLocation(mCont: Context) {
     fun getLocation(): Location? {
         if (!checkStatus()) {
             start()
-            return null
         }
         if (gpsLocation.locations != null)
             return gpsLocation.locations

@@ -2,6 +2,7 @@ package com.example.larp_app.services
 
 import android.app.Service
 import android.content.Intent
+import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import com.example.larp_app.others.MyPermissions
@@ -22,9 +23,9 @@ class HubService : Service() {
 
     // Binder given to clients
     private val binder = HubBinder()
-
-    //private val server: String = "http://192.168.2.2:45455"
-    private val server: String = "https://larpserver.herokuapp.com"
+    private var previousLocation: Location? = null
+    private val server: String = "http://192.168.0.10:45455"
+    //private val server: String = "https://larpserver.herokuapp.com"
 
     private lateinit var hubConnection: HubConnection
     private val perms = MyPermissions(this)
@@ -157,7 +158,7 @@ class HubService : Service() {
                 }
             }
         }
-        timer.schedule(taskTimer, 0, 2000)
+        timer.schedule(taskTimer, 1000, 2000)
     }
 
     private fun sendLocation() {
@@ -167,12 +168,18 @@ class HubService : Service() {
                 if (checkConnectionDialog()) {
                     val loc = location.getLocation()
                     if (loc != null) {
-                        hubConnection.invoke("UpdateLocation", loc.latitude, loc.longitude, token)
+                        if (previousLocation == null) {
+                            hubConnection.invoke("UpdateLocation", loc.latitude, loc.longitude, token)
+                        } else if (previousLocation!!.latitude != loc.latitude
+                            || previousLocation!!.longitude != loc.longitude) {
+                            hubConnection.invoke("UpdateLocation", loc.latitude, loc.longitude, token)
+                        }
+                        previousLocation = loc
                     } else callback?.showToast("Musisz uruchomić lokalizację")
                 }
             }
         }
-        timer.schedule(taskTimer, 0, 2000)
+        timer.schedule(taskTimer, 1000, 2000)
     }
 
     fun register(email: String, name: String, password: String) {
