@@ -156,7 +156,7 @@ class HubService : Service() {
                     hubConnection.start()
                 }
                 count++
-                if (count%5 == 0) {
+                if (count % 5 == 0) {
                     checkConnectionDialog()
                 }
             }
