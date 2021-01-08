@@ -36,7 +36,6 @@ class GameActivity : IHubCallback, AppCompatActivity() {
             hub = binder.getService()
             hub.setCallbacks(this@GameActivity)
             bound = true
-            hub.checkConnectionDialog()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {

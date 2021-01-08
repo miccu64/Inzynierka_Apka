@@ -42,7 +42,6 @@ class MainActivity : IHubCallback, AppCompatActivity() {
             //register this for callbacks from HubService to fragments
             hub.setCallbacks(this@MainActivity)
             bound = true
-            hub.checkConnectionDialog()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
