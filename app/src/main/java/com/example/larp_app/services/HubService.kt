@@ -130,20 +130,19 @@ class HubService : Service() {
         timer = Timer()
     }
 
-    fun checkConnectionDialog(): Boolean {
+    fun checkConnectionDialog(){
         if (!checkHubConnection()) {
             if (!perms.checkInternetConnection()) {
                 callback?.showDialog("Wyłączona transmisja danych", "Uruchom transmisję danych.")
             } else callback?.showDialog("Brak połączenia", "Ponowne łączenie...")
         }
-        return checkHubConnection()
     }
 
     private fun connect() {
         resetTimer()
-        checkConnectionDialog()
 
         taskTimer = object : TimerTask() {
+            var count = 0
             override fun run() {
                 if (checkHubConnection()) {
                     callback?.hideDialog()
@@ -156,16 +155,21 @@ class HubService : Service() {
                 } else if (perms.checkInternetConnection()) {
                     hubConnection.start()
                 }
+                count++
+                if (count%5 == 0) {
+                    checkConnectionDialog()
+                }
             }
         }
-        timer.schedule(taskTimer, 1000, 2000)
+        timer.schedule(taskTimer, 0, 2000)
     }
 
     private fun sendLocation() {
         resetTimer()
+        checkConnectionDialog()
         taskTimer = object : TimerTask() {
             override fun run() {
-                if (checkConnectionDialog()) {
+                if (checkHubConnection()) {
                     val loc = location.getLocation()
                     if (loc != null) {
                         if (previousLocation == null) {
@@ -179,39 +183,39 @@ class HubService : Service() {
                 }
             }
         }
-        timer.schedule(taskTimer, 1000, 2000)
+        timer.schedule(taskTimer, 200, 2000)
     }
 
     fun register(email: String, name: String, password: String) {
-        if (checkConnectionDialog()) {
+        if (checkHubConnection()) {
             callback?.showDialog("", "Rejestrowanie...")
             hubConnection.invoke("RegisterNewUser", email, name, password)
         }
     }
 
     fun login(email: String, password: String) {
-        if (checkConnectionDialog()) {
+        if (checkHubConnection()) {
             callback?.showDialog("", "Logowanie...")
             hubConnection.invoke("Login", email, password)
         }
     }
 
     fun createRoom(roomName: String, password: String, team: Int) {
-        if (checkConnectionDialog()) {
+        if (checkHubConnection()) {
             callback?.showDialog("", "Tworzenie pokoju...")
             hubConnection.invoke("CreateRoom", roomName, password, team, token)
         }
     }
 
     fun joinRoom(roomName: String, password: String, team: Int) {
-        if (checkConnectionDialog()) {
+        if (checkHubConnection()) {
             callback?.showDialog("", "Dołączanie do pokoju...")
             hubConnection.invoke("JoinRoom", roomName, password, team, token)
         }
     }
 
     fun joinJoinedRoom(roomName: String, lostConnection: Boolean) {
-        if (checkConnectionDialog()) {
+        if (checkHubConnection()) {
             if (!lostConnection) {
                 callback?.showDialog("", "Dołączanie do pokoju...")
             }
@@ -220,27 +224,27 @@ class HubService : Service() {
     }
 
     fun sendMessage(message: String, toAll: Boolean) {
-        if (checkConnectionDialog())
+        if (checkHubConnection())
             hubConnection.invoke("SendMessage", message, joinedRoomName, toAll, token)
     }
 
     fun giveAdmin(nick: String) {
-        if (checkConnectionDialog())
+        if (checkHubConnection())
             hubConnection.invoke("GiveAdmin", joinedRoomName, nick, token)
     }
 
     fun throwPlayer(nick: String) {
-        if (checkConnectionDialog())
+        if (checkHubConnection())
             hubConnection.invoke("ThrowPlayer", joinedRoomName, nick, token)
     }
 
     fun leaveRoom() {
-        if (checkConnectionDialog())
+        if (checkHubConnection())
             hubConnection.invoke("LeaveRoom", joinedRoomName, token)
     }
 
     fun deleteRoom() {
-        if (checkConnectionDialog())
+        if (checkHubConnection())
             hubConnection.invoke("DeleteRoom", joinedRoomName, token)
     }
 }
